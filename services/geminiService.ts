@@ -1,11 +1,34 @@
 import { GoogleGenAI } from "@google/genai";
 import { PlannerFormData } from "../types";
 
-// Initialize the Google GenAI client
-// The API key must be obtained exclusively from the environment variable process.env.API_KEY
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Helper to call Gemini API
+async function callGemini(systemInstruction: string, userPrompt: string): Promise<string> {
+  // The API key must be obtained exclusively from the environment variable process.env.API_KEY
+  if (!process.env.API_KEY) {
+    console.error("Missing process.env.API_KEY");
+    return "Error: API Key is missing. Please configure process.env.API_KEY.";
+  }
 
-// --- CACHING UTILITIES (Crucial for cost saving) ---
+  try {
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    
+    // Use gemini-2.5-flash for basic text tasks
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: userPrompt,
+      config: {
+        systemInstruction: systemInstruction,
+      }
+    });
+
+    return response.text || "No response generated.";
+  } catch (error) {
+    console.error("Gemini API Error:", error);
+    return "Error: Unable to connect to AI service. Please try again later.";
+  }
+}
+
+// --- CACHING UTILITIES ---
 const getCachedResponse = (key: string): string | null => {
   try {
     const cached = localStorage.getItem(key);
@@ -16,7 +39,6 @@ const getCachedResponse = (key: string): string | null => {
 
 const setCachedResponse = (key: string, value: string) => {
   try {
-    // Limit cache size roughly
     if (localStorage.length > 50) localStorage.clear();
     localStorage.setItem(key, value);
   } catch (e) { console.warn("Cache write error", e); }
@@ -50,22 +72,9 @@ export const generateSmartHomePlan = async (data: PlannerFormData): Promise<stri
   3. **Automation Idea**: One simple "If This Then That" rule.
   4. **Estimated Total**: Rough cost.`;
 
-  try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: userPrompt,
-      config: {
-        systemInstruction: systemInstruction,
-      },
-    });
-
-    const text = response.text || "Unable to generate plan.";
-    setCachedResponse(cacheKey, text);
-    return text;
-  } catch (error) {
-    console.error("Gemini API Error:", error);
-    return "Error: Unable to generate smart home plan. Please try again.";
-  }
+  const text = await callGemini(systemInstruction, userPrompt);
+  if (!text.startsWith("Error")) setCachedResponse(cacheKey, text);
+  return text;
 };
 
 export const checkDeviceCompatibility = async (deviceA: string, deviceB: string): Promise<string> => {
@@ -78,22 +87,9 @@ export const checkDeviceCompatibility = async (deviceA: string, deviceB: string)
   Then explain protocol details (Zigbee/Matter/Thread) in 2 sentences.
   If NO, suggest a bridge with an Amazon link: [Bridge Name](https://www.amazon.com/s?k=Bridge+Name).`;
 
-  try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: `Check compatibility between ${deviceA} and ${deviceB}.`,
-      config: {
-        systemInstruction: systemInstruction,
-      },
-    });
-
-    const text = response.text || "Unable to check compatibility.";
-    setCachedResponse(key, text);
-    return text;
-  } catch (error) {
-    console.error("Gemini API Error:", error);
-    return "Error: Unable to check compatibility. Please try again.";
-  }
+  const text = await callGemini(systemInstruction, `Check compatibility between ${deviceA} and ${deviceB}.`);
+  if (!text.startsWith("Error")) setCachedResponse(key, text);
+  return text;
 };
 
 export const troubleshootIssue = async (problemDescription: string): Promise<string> => {
@@ -103,20 +99,7 @@ export const troubleshootIssue = async (problemDescription: string): Promise<str
 
   const systemInstruction = `You are a tech support assistant. Provide 3 numbered, actionable steps to fix smart home issues. Keep it brief.`;
   
-  try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: `Fix this: ${problemDescription}`,
-      config: {
-        systemInstruction: systemInstruction,
-      },
-    });
-
-    const text = response.text || "Unable to find solution.";
-    setCachedResponse(key, text);
-    return text;
-  } catch (error) {
-    console.error("Gemini API Error:", error);
-    return "Error: Unable to troubleshoot issue. Please try again.";
-  }
+  const text = await callGemini(systemInstruction, `Fix this: ${problemDescription}`);
+  if (!text.startsWith("Error")) setCachedResponse(key, text);
+  return text;
 };
