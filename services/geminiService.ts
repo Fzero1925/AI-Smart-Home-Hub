@@ -1,146 +1,122 @@
-import { GoogleGenAI } from "@google/genai";
 import { PlannerFormData } from "../types";
 
-const apiKey = process.env.API_KEY || '';
-const ai = new GoogleGenAI({ apiKey });
+// Configuration for DeepSeek (or OpenAI)
+// Get your key from: https://platform.deepseek.com/
+const API_KEY = process.env.VITE_DEEPSEEK_API_KEY || process.env.API_KEY || ''; 
+const API_URL = "https://api.deepseek.com/chat/completions";
+const MODEL_NAME = "deepseek-chat"; // V3 Model
 
-// Use Flash model for speed and low cost
-const MODEL_NAME = 'gemini-2.5-flash';
+// Helper for standard OpenAI-compatible fetch
+const callAI = async (systemPrompt: string, userPrompt: string, temperature = 0.7) => {
+  if (!API_KEY) {
+    return "Error: API Key is missing. Please set VITE_DEEPSEEK_API_KEY in your Vercel project settings.";
+  }
 
-// --- CACHING UTILITIES ---
-// In a production app, you might use a database (Supabase/Firebase).
-// For now, we use localStorage to save costs on the user's session.
+  try {
+    const response = await fetch(API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${API_KEY}`
+      },
+      body: JSON.stringify({
+        model: MODEL_NAME,
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt }
+        ],
+        temperature: temperature,
+        stream: false
+      })
+    });
+
+    if (!response.ok) {
+      const err = await response.json();
+      console.error("AI API Error:", err);
+      return `Error: ${err.error?.message || 'API Request Failed'}`;
+    }
+
+    const data = await response.json();
+    return data.choices[0].message.content;
+  } catch (error) {
+    console.error("Network Error:", error);
+    return "Network error. Please check your connection.";
+  }
+};
+
+// --- CACHING UTILITIES (Crucial for cost saving) ---
 const getCachedResponse = (key: string): string | null => {
   try {
     const cached = localStorage.getItem(key);
     if (cached) return cached;
-  } catch (e) {
-    console.warn("Cache retrieval failed", e);
-  }
+  } catch (e) { console.warn("Cache read error", e); }
   return null;
 };
 
 const setCachedResponse = (key: string, value: string) => {
   try {
+    // Limit cache size roughly
+    if (localStorage.length > 50) localStorage.clear();
     localStorage.setItem(key, value);
-  } catch (e) {
-    console.warn("Cache save failed", e);
-  }
+  } catch (e) { console.warn("Cache write error", e); }
 };
 
-const generateCacheKey = (prefix: string, data: any) => {
-  return `${prefix}_${JSON.stringify(data)}`;
-};
-// -------------------------
+const generateCacheKey = (prefix: string, data: any) => `${prefix}_${JSON.stringify(data)}`;
+
+// --- EXPORTED FUNCTIONS ---
 
 export const generateSmartHomePlan = async (data: PlannerFormData): Promise<string> => {
-  const cacheKey = generateCacheKey('plan', data);
+  const cacheKey = generateCacheKey('plan_ds', data);
   const cached = getCachedResponse(cacheKey);
   if (cached) return cached;
 
-  try {
-    const prioritiesStr = data.priorities.join(", ");
-    const prompt = `
-      Act as a Smart Home Sales Engineer designed to monetize content. 
-      The user wants a smart home plan.
+  const prioritiesStr = data.priorities.join(", ");
+  const systemPrompt = `You are an expert Smart Home Consultant. Your goal is to provide a helpful, structured buying guide. 
+  
+  CRITICAL: You must format all product recommendations as Amazon Search Links using Markdown.
+  Format: [Product Name](https://www.amazon.com/s?k=Product+Name+${data.ecosystem.replace(' ', '+')})
+  
+  Do not include introductory fluff. Go straight to the plan.`;
 
-      User Profile:
-      - Home Type: ${data.homeType}
-      - Ecosystem: ${data.ecosystem}
-      - Budget: ${data.budget}
-      - Tech Level: ${data.skillLevel}
-      - Priorities: ${prioritiesStr}
+  const userPrompt = `Create a smart home plan for a ${data.homeType} using ${data.ecosystem}. 
+  Budget: ${data.budget}. 
+  User Level: ${data.skillLevel}.
+  Priorities: ${prioritiesStr}.
+  
+  Structure:
+  1. **Core Hub**: The brain.
+  2. **Essential Devices**: 3-4 items based on priorities.
+  3. **Automation Idea**: One simple "If This Then That" rule.
+  4. **Estimated Total**: Rough cost.`;
 
-      Task:
-      Generate a practical setup guide. 
-      
-      CRITICAL MONETIZATION REQUIREMENT:
-      When recommending specific products, DO NOT just write the name. 
-      Format them as Markdown links searching on Amazon. 
-      Format: [Product Name](https://www.amazon.com/s?k=Product+Name+${data.ecosystem.replace(' ', '+')})
-      
-      Structure (Markdown):
-      1. **Hub Choice**: The brain of the system.
-      2. **Essential Devices**: List 3-5 specific devices (bulbs, plugs, sensors) matching the budget. Use the link format above.
-      3. **Automation Logic**: One "If This Then That" scenario.
-      4. **Cost Estimate**: Rough math.
-      
-      Keep it concise to save tokens.
-    `;
-
-    const response = await ai.models.generateContent({
-      model: MODEL_NAME,
-      contents: prompt,
-    });
-
-    const text = response.text || "Sorry, generation failed.";
-    setCachedResponse(cacheKey, text); // Save to cache
-    return text;
-
-  } catch (error) {
-    console.error("Gemini API Error:", error);
-    return "Error generating plan. Please try again in a moment.";
-  }
+  const text = await callAI(systemPrompt, userPrompt);
+  setCachedResponse(cacheKey, text);
+  return text;
 };
 
 export const checkDeviceCompatibility = async (deviceA: string, deviceB: string): Promise<string> => {
-  // Normalize inputs to improve cache hit rate (e.g., "alexa" == "Alexa")
-  const key = generateCacheKey('comp', { a: deviceA.toLowerCase().trim(), b: deviceB.toLowerCase().trim() });
+  const key = generateCacheKey('comp_ds', { a: deviceA.toLowerCase().trim(), b: deviceB.toLowerCase().trim() });
   const cached = getCachedResponse(key);
   if (cached) return cached;
 
-  try {
-    const prompt = `
-      Act as a Tech Compatibility Database.
-      User asks: "Does ${deviceA} work with ${deviceB}?"
-      
-      Task:
-      1. Answer YES, NO, or REQUIRES BRIDGE (Bold this part).
-      2. Explanation: 2 sentences max on protocols (Zigbee/Thread/WiFi).
-      3. Workaround: If NO, suggest a specific bridge or hub product formatted as an Amazon Search link: [Bridge Name](https://www.amazon.com/s?k=Bridge+Name).
-      
-      Keep it short.
-    `;
+  const systemPrompt = `You are a strict technical compatibility checker. 
+  Answer starts with: **YES**, **NO**, or **REQUIRES BRIDGE**.
+  Then explain protocol details (Zigbee/Matter/Thread) in 2 sentences.
+  If NO, suggest a bridge with an Amazon link: [Bridge Name](https://www.amazon.com/s?k=Bridge+Name).`;
 
-    const response = await ai.models.generateContent({
-      model: MODEL_NAME,
-      contents: prompt,
-    });
-
-    const text = response.text || "Analysis failed.";
-    setCachedResponse(key, text);
-    return text;
-  } catch (error) {
-    console.error("Gemini API Error:", error);
-    return "Error checking compatibility.";
-  }
+  const text = await callAI(systemPrompt, `Check compatibility between ${deviceA} and ${deviceB}.`);
+  setCachedResponse(key, text);
+  return text;
 };
 
 export const troubleshootIssue = async (problemDescription: string): Promise<string> => {
-  // Troubleshooting is less likely to be repeated exactly, but we cache briefly anyway
-  const key = generateCacheKey('fix', problemDescription.toLowerCase().trim());
+  const key = generateCacheKey('fix_ds', problemDescription.toLowerCase().trim());
   const cached = getCachedResponse(key);
   if (cached) return cached;
 
-  try {
-    const prompt = `
-      Act as Smart Home Support.
-      Problem: "${problemDescription}"
-      
-      Provide 3 numbered steps to fix it. 
-      If a tool/replacement is likely needed (e.g. a new router, a battery), link to it on Amazon: [Item](https://www.amazon.com/s?k=Item).
-    `;
-
-    const response = await ai.models.generateContent({
-      model: MODEL_NAME,
-      contents: prompt,
-    });
-
-    const text = response.text || "Could not generate steps.";
-    setCachedResponse(key, text);
-    return text;
-  } catch (error) {
-    console.error("Gemini API Error:", error);
-    return "Service temporarily unavailable.";
-  }
+  const systemPrompt = `You are a tech support assistant. Provide 3 numbered, actionable steps to fix smart home issues. Keep it brief.`;
+  
+  const text = await callAI(systemPrompt, `Fix this: ${problemDescription}`);
+  setCachedResponse(key, text);
+  return text;
 };

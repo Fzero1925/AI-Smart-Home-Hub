@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { generateSmartHomePlan } from '../services/geminiService';
 import { PlannerFormData } from '../types';
+import { AdPlaceholder } from './AdPlaceholder';
 import ReactMarkdown from 'react-markdown';
 import { Loader2, ArrowRight, Home, DollarSign, Cpu, ShoppingBag } from 'lucide-react';
 
@@ -143,6 +144,11 @@ export const Planner: React.FC = () => {
               Generate Plan
             </button>
           </form>
+          
+          {/* Ad Unit: Sidebar */}
+          <div className="mt-8">
+            <AdPlaceholder format="rectangle" />
+          </div>
         </div>
       </div>
 
@@ -151,8 +157,8 @@ export const Planner: React.FC = () => {
         {loading && (
           <div className="h-full min-h-[400px] flex flex-col items-center justify-center bg-white rounded-2xl border border-slate-200 p-8 text-center animate-pulse">
             <Loader2 className="animate-spin text-blue-500 mb-4" size={48} />
-            <h3 className="text-xl font-semibold text-slate-800">Analyzing compatibility data...</h3>
-            <p className="text-slate-500 mt-2">Designing the perfect setup for your {formData.homeType}.</p>
+            <h3 className="text-xl font-semibold text-slate-800">Consulting AI Architect...</h3>
+            <p className="text-slate-500 mt-2">DeepSeek V3 is analyzing {formData.ecosystem} compatibility.</p>
           </div>
         )}
 
@@ -169,29 +175,34 @@ export const Planner: React.FC = () => {
         )}
 
         {result && (
-          <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-8 overflow-hidden">
-             <div className="prose prose-slate prose-blue max-w-none">
-                <ReactMarkdown 
-                  components={{
-                    a: ({node, ...props}) => (
-                      <a 
-                        {...props} 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        className="inline-flex items-center gap-1 text-blue-600 font-bold no-underline hover:text-blue-800 border-b-2 border-blue-100 hover:border-blue-500 transition-all"
-                      >
-                        <ShoppingBag size={14} className="inline mb-1" />
-                        {props.children}
-                      </a>
-                    )
-                  }}
-                >
-                  {result}
-                </ReactMarkdown>
+          <div className="flex flex-col gap-6">
+             <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-8 overflow-hidden">
+                <div className="prose prose-slate prose-blue max-w-none">
+                    <ReactMarkdown 
+                      components={{
+                        a: ({node, ...props}) => (
+                          <a 
+                            {...props} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="inline-flex items-center gap-1 text-blue-600 font-bold no-underline hover:text-blue-800 border-b-2 border-blue-100 hover:border-blue-500 transition-all"
+                          >
+                            <ShoppingBag size={14} className="inline mb-1" />
+                            {props.children}
+                          </a>
+                        )
+                      }}
+                    >
+                      {result}
+                    </ReactMarkdown>
+                </div>
+                <div className="mt-8 pt-6 border-t border-slate-100 text-center text-sm text-slate-400">
+                  * Prices are estimates. Links take you to Amazon search.
+                </div>
              </div>
-             <div className="mt-8 pt-6 border-t border-slate-100 text-center text-sm text-slate-400">
-               * Prices are estimates. Links will take you to Amazon search results.
-             </div>
+             
+             {/* Ad Unit: Bottom of Content */}
+             <AdPlaceholder format="horizontal" />
           </div>
         )}
       </div>

@@ -2,7 +2,9 @@ export enum ViewState {
   HOME = 'HOME',
   PLANNER = 'PLANNER',
   COMPATIBILITY = 'COMPATIBILITY',
-  TROUBLESHOOT = 'TROUBLESHOOT'
+  TROUBLESHOOT = 'TROUBLESHOOT',
+  PRIVACY = 'PRIVACY',
+  TERMS = 'TERMS'
 }
 
 export interface PlannerFormData {

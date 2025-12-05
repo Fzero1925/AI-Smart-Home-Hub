@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { checkDeviceCompatibility } from '../services/geminiService';
+import { AdPlaceholder } from './AdPlaceholder';
 import { Loader2, Link as LinkIcon, AlertTriangle, CheckCircle, XCircle, Search, TrendingUp } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
@@ -22,8 +23,6 @@ export const Compatibility: React.FC = () => {
   const loadPreset = (a: string, b: string) => {
     setDeviceA(a);
     setDeviceB(b);
-    // Automatically trigger check slightly after setting state would require useEffect, 
-    // but for simplicity we just set values. User clicks check.
   };
 
   return (
@@ -33,7 +32,7 @@ export const Compatibility: React.FC = () => {
         <p className="text-slate-600 mt-2">Will it work? Find out before you buy.</p>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200 mb-12">
+      <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200 mb-8">
         <div className="p-1 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
         <div className="p-8">
           <form onSubmit={handleCheck} className="flex flex-col md:flex-row gap-4 items-end">
@@ -93,11 +92,14 @@ export const Compatibility: React.FC = () => {
                 {result}
               </ReactMarkdown>
             </div>
+            {/* Ad Unit inside results */}
+            <div className="mt-6">
+              <AdPlaceholder format="horizontal" />
+            </div>
           </div>
         )}
       </div>
 
-      {/* Popular Presets - Good for Engagement & "Static" content feel */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
            <h3 className="font-semibold text-slate-800 mb-4 flex items-center gap-2">
@@ -123,15 +125,9 @@ export const Compatibility: React.FC = () => {
            </div>
         </div>
 
-        <div className="bg-blue-50 p-6 rounded-xl border border-blue-100">
-          <h3 className="font-semibold text-blue-900 mb-2">Why check compatibility?</h3>
-          <p className="text-sm text-blue-800 mb-4">
-            Smart home standards (Matter, Zigbee, Z-Wave) are confusing. Buying the wrong device means it won't connect to your hub.
-          </p>
-          <div className="flex gap-2 text-xs">
-            <span className="px-2 py-1 bg-white rounded-md text-slate-600 border border-blue-100">Matter Ready</span>
-            <span className="px-2 py-1 bg-white rounded-md text-slate-600 border border-blue-100">Zigbee 3.0</span>
-          </div>
+        {/* Replaced Text Block with Ad Placeholder for better monetization */}
+        <div className="flex flex-col gap-4">
+           <AdPlaceholder format="rectangle" className="h-full bg-white" />
         </div>
       </div>
     </div>

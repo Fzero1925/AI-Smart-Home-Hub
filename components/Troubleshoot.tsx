@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { troubleshootIssue } from '../services/geminiService';
+import { AdPlaceholder } from './AdPlaceholder';
 import { Loader2, Wrench, MessageSquare, Send } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
@@ -39,6 +40,9 @@ export const Troubleshoot: React.FC = () => {
                 <li>"Alexa can't find my new plug"</li>
                 <li>"Nest thermostat keeps going offline"</li>
               </ul>
+              <div className="mt-8 w-full max-w-xs">
+                 <AdPlaceholder format="horizontal" />
+              </div>
             </div>
           )}
           
@@ -50,20 +54,23 @@ export const Troubleshoot: React.FC = () => {
                 <div className="bg-white p-4 rounded-2xl rounded-tl-none shadow-sm border border-slate-200">
                   <div className="flex items-center gap-2 text-slate-600">
                     <Loader2 className="animate-spin" size={16} />
-                    Diagnosing the issue...
+                    Diagnosing the issue using DeepSeek AI...
                   </div>
                 </div>
              </div>
           )}
 
           {response && (
-             <div className="flex items-start gap-4 animate-in fade-in slide-in-from-bottom-2">
-                <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
-                   <Wrench className="text-white" size={18} />
+             <div className="flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-2">
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
+                     <Wrench className="text-white" size={18} />
+                  </div>
+                  <div className="bg-white p-6 rounded-2xl rounded-tl-none shadow-sm border border-slate-200 prose prose-slate max-w-none prose-sm">
+                    <ReactMarkdown>{response}</ReactMarkdown>
+                  </div>
                 </div>
-                <div className="bg-white p-6 rounded-2xl rounded-tl-none shadow-sm border border-slate-200 prose prose-slate max-w-none prose-sm">
-                  <ReactMarkdown>{response}</ReactMarkdown>
-                </div>
+                <AdPlaceholder format="horizontal" className="ml-14" />
              </div>
           )}
         </div>
