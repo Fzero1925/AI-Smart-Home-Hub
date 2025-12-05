@@ -54,7 +54,7 @@ export const Troubleshoot: React.FC = () => {
                 <div className="bg-white p-4 rounded-2xl rounded-tl-none shadow-sm border border-slate-200">
                   <div className="flex items-center gap-2 text-slate-600">
                     <Loader2 className="animate-spin" size={16} />
-                    Diagnosing the issue using DeepSeek AI...
+                    Diagnosing the issue using Gemini AI...
                   </div>
                 </div>
              </div>
