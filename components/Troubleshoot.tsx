@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { troubleshootIssue } from '../services/geminiService';
 import { AdPlaceholder } from './AdPlaceholder';
-import { Loader2, Wrench, MessageSquare, Send } from 'lucide-react';
+import { Loader2, Wrench, MessageSquare, Send, ShoppingBag, CheckCircle2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
 export const Troubleshoot: React.FC = () => {
@@ -28,61 +28,85 @@ export const Troubleshoot: React.FC = () => {
         <p className="text-slate-600 mt-2">Describe your problem, and we'll help you fix it.</p>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden flex flex-col min-h-[500px]">
+      <div className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden flex flex-col min-h-[600px]">
         {/* Chat Area */}
-        <div className="flex-1 p-6 bg-slate-50 overflow-y-auto">
+        <div className="flex-1 p-6 bg-slate-50/50 overflow-y-auto">
           {!response && !loading && (
             <div className="h-full flex flex-col items-center justify-center text-slate-400 opacity-60">
               <MessageSquare size={48} className="mb-4" />
-              <p>Examples:</p>
-              <ul className="text-sm mt-2 text-center space-y-1">
-                <li>"My Hue lights are unreachable in HomeKit"</li>
-                <li>"Alexa can't find my new plug"</li>
-                <li>"Nest thermostat keeps going offline"</li>
+              <p className="font-medium text-slate-500">How can I help you today?</p>
+              <ul className="text-sm mt-4 text-center space-y-2">
+                <li className="bg-white px-3 py-1 rounded-full border border-slate-200">"My Hue lights are unreachable"</li>
+                <li className="bg-white px-3 py-1 rounded-full border border-slate-200">"Alexa can't find my new plug"</li>
+                <li className="bg-white px-3 py-1 rounded-full border border-slate-200">"Nest thermostat offline"</li>
               </ul>
-              <div className="mt-8 w-full max-w-xs">
+              <div className="mt-12 w-full max-w-xs opacity-50">
                  <AdPlaceholder format="horizontal" />
               </div>
             </div>
           )}
           
           {loading && (
-             <div className="flex items-start gap-4 animate-in fade-in slide-in-from-bottom-2">
-                <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
+             <div className="flex items-start gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0 shadow-md">
                   <Wrench className="text-white" size={18} />
                 </div>
                 <div className="bg-white p-4 rounded-2xl rounded-tl-none shadow-sm border border-slate-200">
-                  <div className="flex items-center gap-2 text-slate-600">
-                    <Loader2 className="animate-spin" size={16} />
-                    Diagnosing the issue using DeepSeek AI...
+                  <div className="flex items-center gap-3 text-slate-600">
+                    <Loader2 className="animate-spin text-blue-500" size={20} />
+                    <span className="font-medium">Analyzing diagnostic data...</span>
                   </div>
                 </div>
              </div>
           )}
 
           {response && (
-             <div className="flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-2">
+             <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out">
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
-                     <Wrench className="text-white" size={18} />
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0 shadow-lg ring-2 ring-white">
+                     <CheckCircle2 className="text-white" size={20} />
                   </div>
-                  <div className="bg-white p-6 rounded-2xl rounded-tl-none shadow-sm border border-slate-200 prose prose-slate max-w-none prose-sm">
-                    <ReactMarkdown>{response}</ReactMarkdown>
+                  
+                  {/* AI Response Card */}
+                  <div className="bg-gradient-to-br from-white to-blue-50/50 p-6 rounded-2xl rounded-tl-none shadow-md border border-blue-100 prose prose-slate max-w-none group">
+                    <ReactMarkdown
+                      components={{
+                        a: ({node, ...props}) => (
+                          <a 
+                            {...props} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="inline-flex items-center gap-1 text-blue-600 font-bold no-underline hover:text-blue-800 border-b-2 border-blue-100 hover:border-blue-500 transition-all bg-white px-1 rounded-md mx-1 shadow-sm"
+                          >
+                            <ShoppingBag size={14} className="inline mb-1" />
+                            {props.children}
+                          </a>
+                        ),
+                        h1: ({node, ...props}) => <h3 className="text-lg font-bold text-blue-900 mt-0" {...props} />,
+                        h2: ({node, ...props}) => <h4 className="text-md font-bold text-slate-800" {...props} />,
+                        li: ({node, ...props}) => <li className="marker:text-blue-500" {...props} />
+                      }}
+                    >
+                      {response}
+                    </ReactMarkdown>
                   </div>
                 </div>
-                <AdPlaceholder format="horizontal" className="ml-14" />
+                
+                <div className="pl-14">
+                  <AdPlaceholder format="horizontal" className="shadow-sm bg-white" />
+                </div>
              </div>
           )}
         </div>
 
         {/* Input Area */}
-        <div className="p-4 bg-white border-t border-slate-200">
-          <div className="relative">
+        <div className="p-4 bg-white border-t border-slate-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+          <div className="relative max-w-4xl mx-auto">
             <textarea
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Describe your issue..."
-              className="w-full pl-4 pr-12 py-3 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none h-14"
+              placeholder="Describe your issue (e.g., 'My Ecobee thermostat screen is blank')..."
+              className="w-full pl-5 pr-14 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:bg-white focus:outline-none resize-none h-16 shadow-inner transition-all text-slate-700"
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                   e.preventDefault();
@@ -93,11 +117,14 @@ export const Troubleshoot: React.FC = () => {
             <button 
               onClick={handleSolve}
               disabled={loading || !query.trim()}
-              className="absolute right-2 top-2 p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+              className="absolute right-2 top-2 bottom-2 aspect-square bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:hover:bg-blue-600 transition-all shadow-md hover:shadow-lg flex items-center justify-center group"
             >
-              <Send size={18} />
+              <Send size={20} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
             </button>
           </div>
+          <p className="text-center text-xs text-slate-400 mt-3">
+            AI can make mistakes. Always check official manuals before modifying electrical wiring.
+          </p>
         </div>
       </div>
     </div>

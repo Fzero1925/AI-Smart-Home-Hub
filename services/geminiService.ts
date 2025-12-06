@@ -1,19 +1,9 @@
 import { GoogleGenAI } from "@google/genai";
 import { PlannerFormData } from "../types";
 
-// --- CONFIGURATION ---
-// Set this to TRUE to use Google Gemini.
-// Set this to FALSE to use DeepSeek (Current default for cost saving).
-const USE_GEMINI = false;
-
-// --- GOOGLE GEMINI SETUP ---
-// Even if unused, we initialize it to ensure type safety and build validity.
-// The key comes from process.env.API_KEY (mapped in vite.config.ts).
+// --- GEMINI SETUP ---
+// API Key must be obtained exclusively from process.env.API_KEY as per guidelines.
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
-// --- DEEPSEEK SETUP ---
-const DEEPSEEK_API_KEY = (import.meta as any).env?.VITE_DEEPSEEK_API_KEY || '';
-const DEEPSEEK_API_URL = "https://api.deepseek.com/chat/completions";
 
 // --- CACHING UTILITIES ---
 const getCachedResponse = (key: string): string | null => {
@@ -32,37 +22,6 @@ const setCachedResponse = (key: string, value: string) => {
 };
 
 const generateCacheKey = (prefix: string, data: any) => `${prefix}_${JSON.stringify(data)}`;
-
-// --- HELPER: DEEPSEEK FETCH ---
-const callDeepSeek = async (systemPrompt: string, userPrompt: string): Promise<string> => {
-  try {
-    const response = await fetch(DEEPSEEK_API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: "deepseek-chat",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt }
-        ],
-        stream: false
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error(`DeepSeek API Error: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    return data.choices?.[0]?.message?.content || "No response generated.";
-  } catch (error) {
-    console.error("DeepSeek Service Error:", error);
-    return "Error: Unable to connect to DeepSeek AI service. Please check your API Key configuration.";
-  }
-};
 
 // --- EXPORTED FUNCTIONS ---
 
@@ -90,26 +49,25 @@ export const generateSmartHomePlan = async (data: PlannerFormData): Promise<stri
   3. **Automation Idea**: One simple "If This Then That" rule.
   4. **Estimated Total**: Rough cost.`;
 
-  let text = "";
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: userPrompt,
+      config: {
+        systemInstruction: systemInstruction,
+      },
+    });
 
-  if (USE_GEMINI) {
-    try {
-      const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: userPrompt,
-        config: { systemInstruction: systemInstruction }
-      });
-      text = response.text || "No response generated.";
-    } catch (error) {
-       console.error("Gemini Error:", error);
-       text = "Error: Gemini API failed. Please check configuration.";
+    const text = response.text;
+    if (text) {
+      setCachedResponse(cacheKey, text);
+      return text;
     }
-  } else {
-    text = await callDeepSeek(systemInstruction, userPrompt);
+    return "No response generated.";
+  } catch (error) {
+    console.error("Gemini Service Error:", error);
+    return "Error: Unable to generate smart home plan. Please check your API configuration.";
   }
-
-  if (!text.startsWith("Error:")) setCachedResponse(cacheKey, text);
-  return text;
 };
 
 export const checkDeviceCompatibility = async (deviceA: string, deviceB: string): Promise<string> => {
@@ -124,26 +82,25 @@ export const checkDeviceCompatibility = async (deviceA: string, deviceB: string)
 
   const userPrompt = `Check compatibility between ${deviceA} and ${deviceB}.`;
 
-  let text = "";
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: userPrompt,
+      config: {
+        systemInstruction: systemInstruction,
+      },
+    });
 
-  if (USE_GEMINI) {
-    try {
-      const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: userPrompt,
-        config: { systemInstruction: systemInstruction }
-      });
-      text = response.text || "No response generated.";
-    } catch (error) {
-       console.error("Gemini Error:", error);
-       text = "Error: Gemini API failed. Please check configuration.";
+    const text = response.text;
+    if (text) {
+      setCachedResponse(key, text);
+      return text;
     }
-  } else {
-    text = await callDeepSeek(systemInstruction, userPrompt);
+    return "No response generated.";
+  } catch (error) {
+    console.error("Gemini Service Error:", error);
+    return "Error: Unable to check compatibility. Please check your API configuration.";
   }
-
-  if (!text.startsWith("Error:")) setCachedResponse(key, text);
-  return text;
 };
 
 export const troubleshootIssue = async (problemDescription: string): Promise<string> => {
@@ -154,24 +111,23 @@ export const troubleshootIssue = async (problemDescription: string): Promise<str
   const systemInstruction = `You are a tech support assistant. Provide 3 numbered, actionable steps to fix smart home issues. Keep it brief.`;
   const userPrompt = `Fix this: ${problemDescription}`;
 
-  let text = "";
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: userPrompt,
+      config: {
+        systemInstruction: systemInstruction,
+      },
+    });
 
-  if (USE_GEMINI) {
-    try {
-      const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: userPrompt,
-        config: { systemInstruction: systemInstruction }
-      });
-      text = response.text || "No response generated.";
-    } catch (error) {
-       console.error("Gemini Error:", error);
-       text = "Error: Gemini API failed. Please check configuration.";
+    const text = response.text;
+    if (text) {
+      setCachedResponse(key, text);
+      return text;
     }
-  } else {
-    text = await callDeepSeek(systemInstruction, userPrompt);
+    return "No response generated.";
+  } catch (error) {
+    console.error("Gemini Service Error:", error);
+    return "Error: Unable to troubleshoot issue. Please check your API configuration.";
   }
-
-  if (!text.startsWith("Error:")) setCachedResponse(key, text);
-  return text;
 };
