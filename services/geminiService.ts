@@ -1,5 +1,5 @@
-import { GoogleGenAI } from "@google/genai";
 import { PlannerFormData } from '../types';
+import { GoogleGenAI } from "@google/genai";
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
@@ -29,11 +29,10 @@ Please provide specific product recommendations that work natively with ${data.e
         systemInstruction: systemInstruction,
       },
     });
-
     return response.text || "No response generated.";
   } catch (error) {
-    console.error("Gemini API Error:", error);
-    return "Error: Unable to connect to AI service. Please try again later.";
+    console.error("AI Service Error:", error);
+    return "Error: Unable to connect to AI service. Please check your internet connection and try again.";
   }
 };
 
@@ -57,11 +56,10 @@ Device B: ${deviceB}`;
         systemInstruction: systemInstruction,
       },
     });
-
     return response.text || "No response generated.";
   } catch (error) {
-    console.error("Gemini API Error:", error);
-    return "Error: Unable to connect to AI service. Please try again later.";
+    console.error("AI Service Error:", error);
+    return "Error: Unable to connect to AI service. Please check your internet connection and try again.";
   }
 };
 
@@ -82,10 +80,9 @@ If hardware might be broken, suggest checking warranty.`;
         systemInstruction: systemInstruction,
       },
     });
-
     return response.text || "No response generated.";
   } catch (error) {
-    console.error("Gemini API Error:", error);
-    return "Error: Unable to connect to AI service. Please try again later.";
+    console.error("AI Service Error:", error);
+    return "Error: Unable to connect to AI service. Please check your internet connection and try again.";
   }
 };
