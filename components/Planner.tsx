@@ -158,7 +158,7 @@ export const Planner: React.FC = () => {
           <div className="h-full min-h-[400px] flex flex-col items-center justify-center bg-white rounded-2xl border border-slate-200 p-8 text-center animate-pulse">
             <Loader2 className="animate-spin text-blue-500 mb-4" size={48} />
             <h3 className="text-xl font-semibold text-slate-800">Consulting AI Architect...</h3>
-            <p className="text-slate-500 mt-2">AI is analyzing {formData.ecosystem} compatibility.</p>
+            <p className="text-slate-500 mt-2">DeepSeek AI is analyzing {formData.ecosystem} compatibility.</p>
           </div>
         )}
 
