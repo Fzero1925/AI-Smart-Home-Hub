@@ -54,7 +54,7 @@ export const Troubleshoot: React.FC = () => {
                 <div className="bg-white p-4 rounded-2xl rounded-tl-none shadow-sm border border-slate-200">
                   <div className="flex items-center gap-3 text-slate-600">
                     <Loader2 className="animate-spin text-blue-500" size={20} />
-                    <span className="font-medium">Diagnosing issue with DeepSeek AI...</span>
+                    <span className="font-medium">Diagnosing issue with Gemini...</span>
                   </div>
                 </div>
              </div>

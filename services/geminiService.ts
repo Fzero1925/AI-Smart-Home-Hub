@@ -1,7 +1,5 @@
-import { PlannerFormData } from "../types";
 import { GoogleGenAI } from "@google/genai";
-
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+import { PlannerFormData } from "../types";
 
 // --- CACHING UTILITIES ---
 const getCachedResponse = (key: string): string | null => {
@@ -21,23 +19,8 @@ const setCachedResponse = (key: string, value: string) => {
 
 const generateCacheKey = (prefix: string, data: any) => `${prefix}_${JSON.stringify(data)}`;
 
-// --- GEMINI API CALLER ---
-const callGeminiAI = async (systemInstruction: string, userPrompt: string): Promise<string | null> => {
-  try {
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: userPrompt,
-      config: {
-        systemInstruction: systemInstruction,
-      },
-    });
-
-    return response.text || null;
-  } catch (error) {
-    console.error("Gemini Request Failed:", error);
-    return null;
-  }
-};
+// --- GEMINI API CLIENT ---
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 // --- EXPORTED FUNCTIONS ---
 
@@ -65,11 +48,22 @@ export const generateSmartHomePlan = async (data: PlannerFormData): Promise<stri
   3. **Automation Idea**: One simple "If This Then That" rule.
   4. **Estimated Total**: Rough cost.`;
 
-  const text = await callGeminiAI(systemInstruction, userPrompt);
-  
-  if (text) {
-    setCachedResponse(cacheKey, text);
-    return text;
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: userPrompt,
+      config: {
+        systemInstruction: systemInstruction,
+      },
+    });
+
+    const text = response.text;
+    if (text) {
+      setCachedResponse(cacheKey, text);
+      return text;
+    }
+  } catch (error) {
+    console.error("Gemini Request Failed:", error);
   }
 
   return "Error: Unable to generate plan. Please try again later.";
@@ -87,11 +81,22 @@ export const checkDeviceCompatibility = async (deviceA: string, deviceB: string)
 
   const userPrompt = `Check compatibility between ${deviceA} and ${deviceB}.`;
 
-  const text = await callGeminiAI(systemInstruction, userPrompt);
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: userPrompt,
+      config: {
+        systemInstruction: systemInstruction,
+      },
+    });
 
-  if (text) {
-    setCachedResponse(key, text);
-    return text;
+    const text = response.text;
+    if (text) {
+      setCachedResponse(key, text);
+      return text;
+    }
+  } catch (error) {
+    console.error("Gemini Request Failed:", error);
   }
 
   return "Error: Unable to check compatibility.";
@@ -105,11 +110,22 @@ export const troubleshootIssue = async (problemDescription: string): Promise<str
   const systemInstruction = `You are a tech support assistant. Provide 3 numbered, actionable steps to fix smart home issues. Keep it brief and encouraging. Use Markdown bolding for key terms.`;
   const userPrompt = `Fix this: ${problemDescription}`;
 
-  const text = await callGeminiAI(systemInstruction, userPrompt);
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: userPrompt,
+      config: {
+        systemInstruction: systemInstruction,
+      },
+    });
 
-  if (text) {
-    setCachedResponse(key, text);
-    return text;
+    const text = response.text;
+    if (text) {
+      setCachedResponse(key, text);
+      return text;
+    }
+  } catch (error) {
+    console.error("Gemini Request Failed:", error);
   }
 
   return "Error: Unable to troubleshoot issue.";
