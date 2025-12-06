@@ -1,52 +1,25 @@
 import { GoogleGenAI } from "@google/genai";
-import { PlannerFormData } from "../types";
+import { PlannerFormData } from '../types';
 
-// --- CACHING UTILITIES ---
-const getCachedResponse = (key: string): string | null => {
-  try {
-    const cached = localStorage.getItem(key);
-    if (cached) return cached;
-  } catch (e) { console.warn("Cache read error", e); }
-  return null;
-};
-
-const setCachedResponse = (key: string, value: string) => {
-  try {
-    if (localStorage.length > 50) localStorage.clear();
-    localStorage.setItem(key, value);
-  } catch (e) { console.warn("Cache write error", e); }
-};
-
-const generateCacheKey = (prefix: string, data: any) => `${prefix}_${JSON.stringify(data)}`;
-
-// --- GEMINI API CLIENT ---
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
-// --- EXPORTED FUNCTIONS ---
-
 export const generateSmartHomePlan = async (data: PlannerFormData): Promise<string> => {
-  const cacheKey = generateCacheKey('plan', data);
-  const cached = getCachedResponse(cacheKey);
-  if (cached) return cached;
+  const systemInstruction = `You are an expert Smart Home Architect and Systems Integrator. 
+Your goal is to generate a comprehensive, affiliate-friendly shopping list and setup guide.
+Format the output in clean Markdown.
+For every specific product recommendation, create a search link in this format: [Product Name](https://www.amazon.com/s?k=Product+Name+Smart+Home).
+Structure:
+1. Executive Summary
+2. Core Hub/Controller
+3. Device Checklist (grouped by room or category) with estimated prices
+4. Automation Ideas based on user priorities
+5. Installation Tips`;
 
-  const prioritiesStr = data.priorities.join(", ");
-  const systemInstruction = `You are an expert Smart Home Consultant. Your goal is to provide a helpful, structured buying guide. 
-  
-  CRITICAL: You must format all product recommendations as Amazon Search Links using Markdown.
-  Format: [Product Name](https://www.amazon.com/s?k=Product+Name+${data.ecosystem.replace(' ', '+')})
-  
-  Do not include introductory fluff. Go straight to the plan.`;
-
-  const userPrompt = `Create a smart home plan for a ${data.homeType} using ${data.ecosystem}. 
-  Budget: ${data.budget}. 
-  User Level: ${data.skillLevel}.
-  Priorities: ${prioritiesStr}.
-  
-  Structure:
-  1. **Core Hub**: The brain.
-  2. **Essential Devices**: 3-4 items based on priorities.
-  3. **Automation Idea**: One simple "If This Then That" rule.
-  4. **Estimated Total**: Rough cost.`;
+  const userPrompt = `Design a smart home system for a "${data.homeType}" using the "${data.ecosystem}" ecosystem.
+Budget: ${data.budget}.
+Priorities: ${data.priorities.join(', ')}.
+User Skill Level: ${data.skillLevel}.
+Please provide specific product recommendations that work natively with ${data.ecosystem} (Matter/Thread support preferred if applicable).`;
 
   try {
     const response = await ai.models.generateContent({
@@ -57,29 +30,24 @@ export const generateSmartHomePlan = async (data: PlannerFormData): Promise<stri
       },
     });
 
-    const text = response.text;
-    if (text) {
-      setCachedResponse(cacheKey, text);
-      return text;
-    }
+    return response.text || "No response generated.";
   } catch (error) {
-    console.error("Gemini Request Failed:", error);
+    console.error("Gemini API Error:", error);
+    return "Error: Unable to connect to AI service. Please try again later.";
   }
-
-  return "Error: Unable to generate plan. Please try again later.";
 };
 
 export const checkDeviceCompatibility = async (deviceA: string, deviceB: string): Promise<string> => {
-  const key = generateCacheKey('comp', { a: deviceA.toLowerCase().trim(), b: deviceB.toLowerCase().trim() });
-  const cached = getCachedResponse(key);
-  if (cached) return cached;
+  const systemInstruction = `You are a Senior Smart Home Compatibility Engineer.
+Determine if two devices/systems work together.
+Start with a clear "YES", "NO", or "REQUIRES BRIDGE" in bold.
+Then explain the protocol (Zigbee, Z-Wave, WiFi, Thread, Matter) and how to connect them.
+If they are incompatible, suggest a workaround (e.g., using Home Assistant or a specific hub).
+Format as Markdown.`;
 
-  const systemInstruction = `You are a strict technical compatibility checker. 
-  Answer starts with: **YES**, **NO**, or **REQUIRES BRIDGE**.
-  Then explain protocol details (Zigbee/Matter/Thread) in 2 sentences.
-  If NO, suggest a bridge with an Amazon link: [Bridge Name](https://www.amazon.com/s?k=Bridge+Name).`;
-
-  const userPrompt = `Check compatibility between ${deviceA} and ${deviceB}.`;
+  const userPrompt = `Check compatibility between:
+Device A: ${deviceA}
+Device B: ${deviceB}`;
 
   try {
     const response = await ai.models.generateContent({
@@ -90,25 +58,21 @@ export const checkDeviceCompatibility = async (deviceA: string, deviceB: string)
       },
     });
 
-    const text = response.text;
-    if (text) {
-      setCachedResponse(key, text);
-      return text;
-    }
+    return response.text || "No response generated.";
   } catch (error) {
-    console.error("Gemini Request Failed:", error);
+    console.error("Gemini API Error:", error);
+    return "Error: Unable to connect to AI service. Please try again later.";
   }
-
-  return "Error: Unable to check compatibility.";
 };
 
-export const troubleshootIssue = async (problemDescription: string): Promise<string> => {
-  const key = generateCacheKey('fix', problemDescription.toLowerCase().trim());
-  const cached = getCachedResponse(key);
-  if (cached) return cached;
+export const troubleshootIssue = async (issue: string): Promise<string> => {
+  const systemInstruction = `You are a helpful Smart Home Tech Support Agent.
+Provide a step-by-step troubleshooting guide for the user's issue.
+Be empathetic but technical.
+Use bolding for key steps.
+If hardware might be broken, suggest checking warranty.`;
 
-  const systemInstruction = `You are a tech support assistant. Provide 3 numbered, actionable steps to fix smart home issues. Keep it brief and encouraging. Use Markdown bolding for key terms.`;
-  const userPrompt = `Fix this: ${problemDescription}`;
+  const userPrompt = `I am experiencing this issue: "${issue}". How do I fix it?`;
 
   try {
     const response = await ai.models.generateContent({
@@ -119,14 +83,9 @@ export const troubleshootIssue = async (problemDescription: string): Promise<str
       },
     });
 
-    const text = response.text;
-    if (text) {
-      setCachedResponse(key, text);
-      return text;
-    }
+    return response.text || "No response generated.";
   } catch (error) {
-    console.error("Gemini Request Failed:", error);
+    console.error("Gemini API Error:", error);
+    return "Error: Unable to connect to AI service. Please try again later.";
   }
-
-  return "Error: Unable to troubleshoot issue.";
 };
