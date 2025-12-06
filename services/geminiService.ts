@@ -1,8 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import { PlannerFormData } from "../types";
 
-// --- GEMINI SETUP ---
-// API Key must be obtained exclusively from process.env.API_KEY as per guidelines.
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 // --- CACHING UTILITIES ---
@@ -63,11 +61,10 @@ export const generateSmartHomePlan = async (data: PlannerFormData): Promise<stri
       setCachedResponse(cacheKey, text);
       return text;
     }
-    return "No response generated.";
   } catch (error) {
-    console.error("Gemini Service Error:", error);
-    return "Error: Unable to generate smart home plan. Please check your API configuration.";
+    console.error("Gemini API Error:", error);
   }
+  return "Error: Unable to generate plan. Please try again later.";
 };
 
 export const checkDeviceCompatibility = async (deviceA: string, deviceB: string): Promise<string> => {
@@ -96,11 +93,10 @@ export const checkDeviceCompatibility = async (deviceA: string, deviceB: string)
       setCachedResponse(key, text);
       return text;
     }
-    return "No response generated.";
   } catch (error) {
-    console.error("Gemini Service Error:", error);
-    return "Error: Unable to check compatibility. Please check your API configuration.";
+    console.error("Gemini API Error:", error);
   }
+  return "Error: Unable to check compatibility.";
 };
 
 export const troubleshootIssue = async (problemDescription: string): Promise<string> => {
@@ -108,7 +104,7 @@ export const troubleshootIssue = async (problemDescription: string): Promise<str
   const cached = getCachedResponse(key);
   if (cached) return cached;
 
-  const systemInstruction = `You are a tech support assistant. Provide 3 numbered, actionable steps to fix smart home issues. Keep it brief.`;
+  const systemInstruction = `You are a tech support assistant. Provide 3 numbered, actionable steps to fix smart home issues. Keep it brief and encouraging. Use Markdown bolding for key terms.`;
   const userPrompt = `Fix this: ${problemDescription}`;
 
   try {
@@ -125,9 +121,8 @@ export const troubleshootIssue = async (problemDescription: string): Promise<str
       setCachedResponse(key, text);
       return text;
     }
-    return "No response generated.";
   } catch (error) {
-    console.error("Gemini Service Error:", error);
-    return "Error: Unable to troubleshoot issue. Please check your API configuration.";
+    console.error("Gemini API Error:", error);
   }
+  return "Error: Unable to troubleshoot issue.";
 };

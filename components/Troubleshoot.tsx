@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { troubleshootIssue } from '../services/geminiService';
 import { AdPlaceholder } from './AdPlaceholder';
-import { Loader2, Wrench, MessageSquare, Send, ShoppingBag, CheckCircle2 } from 'lucide-react';
+import { Loader2, Wrench, MessageSquare, Send, ShoppingBag, CheckCircle2, Sparkles } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
 export const Troubleshoot: React.FC = () => {
@@ -36,9 +36,9 @@ export const Troubleshoot: React.FC = () => {
               <MessageSquare size={48} className="mb-4" />
               <p className="font-medium text-slate-500">How can I help you today?</p>
               <ul className="text-sm mt-4 text-center space-y-2">
-                <li className="bg-white px-3 py-1 rounded-full border border-slate-200">"My Hue lights are unreachable"</li>
-                <li className="bg-white px-3 py-1 rounded-full border border-slate-200">"Alexa can't find my new plug"</li>
-                <li className="bg-white px-3 py-1 rounded-full border border-slate-200">"Nest thermostat offline"</li>
+                <li className="bg-white px-3 py-1 rounded-full border border-slate-200 shadow-sm cursor-pointer hover:border-blue-300 hover:text-blue-600 transition-colors" onClick={() => setQuery("My Hue lights are unreachable")}>"My Hue lights are unreachable"</li>
+                <li className="bg-white px-3 py-1 rounded-full border border-slate-200 shadow-sm cursor-pointer hover:border-blue-300 hover:text-blue-600 transition-colors" onClick={() => setQuery("Alexa can't find my new plug")}>"Alexa can't find my new plug"</li>
+                <li className="bg-white px-3 py-1 rounded-full border border-slate-200 shadow-sm cursor-pointer hover:border-blue-300 hover:text-blue-600 transition-colors" onClick={() => setQuery("Nest thermostat offline")}>"Nest thermostat offline"</li>
               </ul>
               <div className="mt-12 w-full max-w-xs opacity-50">
                  <AdPlaceholder format="horizontal" />
@@ -54,21 +54,24 @@ export const Troubleshoot: React.FC = () => {
                 <div className="bg-white p-4 rounded-2xl rounded-tl-none shadow-sm border border-slate-200">
                   <div className="flex items-center gap-3 text-slate-600">
                     <Loader2 className="animate-spin text-blue-500" size={20} />
-                    <span className="font-medium">Analyzing diagnostic data...</span>
+                    <span className="font-medium">Diagnosing issue with Gemini AI...</span>
                   </div>
                 </div>
              </div>
           )}
 
           {response && (
-             <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out">
+             <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-8 duration-700 ease-out">
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0 shadow-lg ring-2 ring-white">
-                     <CheckCircle2 className="text-white" size={20} />
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-lg ring-2 ring-indigo-100">
+                     <Sparkles className="text-white" size={20} />
                   </div>
                   
-                  {/* AI Response Card */}
-                  <div className="bg-gradient-to-br from-white to-blue-50/50 p-6 rounded-2xl rounded-tl-none shadow-md border border-blue-100 prose prose-slate max-w-none group">
+                  {/* AI Response Card - Distinct Styling */}
+                  <div className="bg-gradient-to-br from-white to-indigo-50 p-6 rounded-2xl rounded-tl-none shadow-md border border-indigo-100 prose prose-slate max-w-none group w-full relative">
+                    <div className="absolute top-0 right-0 p-2 opacity-10">
+                      <Wrench size={48} className="text-indigo-900"/>
+                    </div>
                     <ReactMarkdown
                       components={{
                         a: ({node, ...props}) => (
@@ -76,15 +79,16 @@ export const Troubleshoot: React.FC = () => {
                             {...props} 
                             target="_blank" 
                             rel="noopener noreferrer" 
-                            className="inline-flex items-center gap-1 text-blue-600 font-bold no-underline hover:text-blue-800 border-b-2 border-blue-100 hover:border-blue-500 transition-all bg-white px-1 rounded-md mx-1 shadow-sm"
+                            className="inline-flex items-center gap-1 text-indigo-600 font-bold no-underline hover:text-indigo-800 border-b-2 border-indigo-100 hover:border-indigo-500 transition-all bg-white px-2 py-0.5 rounded-md mx-1 shadow-sm hover:shadow-md"
                           >
                             <ShoppingBag size={14} className="inline mb-1" />
                             {props.children}
                           </a>
                         ),
-                        h1: ({node, ...props}) => <h3 className="text-lg font-bold text-blue-900 mt-0" {...props} />,
+                        strong: ({node, ...props}) => <strong className="text-indigo-900 font-bold" {...props} />,
+                        h1: ({node, ...props}) => <h3 className="text-lg font-bold text-indigo-900 mt-0" {...props} />,
                         h2: ({node, ...props}) => <h4 className="text-md font-bold text-slate-800" {...props} />,
-                        li: ({node, ...props}) => <li className="marker:text-blue-500" {...props} />
+                        li: ({node, ...props}) => <li className="marker:text-indigo-500" {...props} />
                       }}
                     >
                       {response}
