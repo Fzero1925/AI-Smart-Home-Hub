@@ -5,7 +5,8 @@ export enum ViewState {
   TROUBLESHOOT = 'TROUBLESHOOT',
   PRIVACY = 'PRIVACY',
   TERMS = 'TERMS',
-  ABOUT = 'ABOUT'
+  ABOUT = 'ABOUT',
+  CONTACT = 'CONTACT'
 }
 
 export interface PlannerFormData {

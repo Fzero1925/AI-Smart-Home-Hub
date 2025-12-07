@@ -5,8 +5,9 @@ import { Compatibility } from './components/Compatibility';
 import { Troubleshoot } from './components/Troubleshoot';
 import { PrivacyPolicy, TermsOfService } from './components/LegalPages';
 import { About } from './components/About';
+import { Contact } from './components/Contact';
 import { ViewState } from './types';
-import { Home, ShieldCheck, Wrench, Menu, X, Info } from 'lucide-react';
+import { Home, ShieldCheck, Wrench, Menu, X, Info, Mail } from 'lucide-react';
 
 const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewState>(ViewState.HOME);
@@ -22,6 +23,7 @@ const App: React.FC = () => {
       case ViewState.PRIVACY: title = "Privacy Policy - AI SmartHome Hub"; break;
       case ViewState.TERMS: title = "Terms of Service - AI SmartHome Hub"; break;
       case ViewState.ABOUT: title = "About Us - AI SmartHome Hub"; break;
+      case ViewState.CONTACT: title = "Contact Us - AI SmartHome Hub"; break;
     }
     document.title = title;
     window.scrollTo(0, 0); // Scroll to top on navigation
@@ -41,6 +43,8 @@ const App: React.FC = () => {
         return <TermsOfService />;
       case ViewState.ABOUT:
         return <About />;
+      case ViewState.CONTACT:
+        return <Contact />;
       case ViewState.HOME:
       default:
         return <Hero onNavigate={setCurrentView} />;
@@ -102,6 +106,7 @@ const App: React.FC = () => {
             <NavLink view={ViewState.COMPATIBILITY} label="Check Compatibility" icon={ShieldCheck} />
             <NavLink view={ViewState.TROUBLESHOOT} label="Fix Problems" icon={Wrench} />
             <NavLink view={ViewState.ABOUT} label="About Us" icon={Info} />
+            <NavLink view={ViewState.CONTACT} label="Contact Us" icon={Mail} />
           </div>
         )}
       </header>
@@ -132,6 +137,7 @@ const App: React.FC = () => {
             <h4 className="text-white font-semibold mb-4">Legal & Info</h4>
             <ul className="space-y-2 text-sm">
               <li className="hover:text-white cursor-pointer" onClick={() => setCurrentView(ViewState.ABOUT)}>About Us</li>
+              <li className="hover:text-white cursor-pointer" onClick={() => setCurrentView(ViewState.CONTACT)}>Contact Us</li>
               <li className="hover:text-white cursor-pointer" onClick={() => setCurrentView(ViewState.PRIVACY)}>Privacy Policy</li>
               <li className="hover:text-white cursor-pointer" onClick={() => setCurrentView(ViewState.TERMS)}>Terms of Service</li>
             </ul>

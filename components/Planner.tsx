@@ -3,11 +3,12 @@ import { generateSmartHomePlan } from '../services/geminiService';
 import { PlannerFormData } from '../types';
 import { AdPlaceholder } from './AdPlaceholder';
 import ReactMarkdown from 'react-markdown';
-import { Loader2, ArrowRight, Home, DollarSign, Cpu, ShoppingBag, BookOpen, Wifi, Lock, Layers } from 'lucide-react';
+import { Loader2, ArrowRight, Home, DollarSign, Cpu, ShoppingBag, BookOpen, Wifi, Lock, Layers, Sparkles, ChevronDown, ChevronUp } from 'lucide-react';
 
 export const Planner: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
+  const [showExplainer, setShowExplainer] = useState(false);
   const [formData, setFormData] = useState<PlannerFormData>({
     homeType: '2-Bedroom Apartment',
     ecosystem: 'Apple HomeKit',
@@ -146,6 +147,28 @@ export const Planner: React.FC = () => {
               </button>
             </form>
             
+            {/* How it works Collapsible */}
+            <div className="mt-6 border-t border-slate-100 pt-4">
+              <button 
+                onClick={() => setShowExplainer(!showExplainer)}
+                className="w-full flex items-center justify-between text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors"
+              >
+                <span className="flex items-center gap-2">
+                  <Sparkles size={16} className="text-amber-500" />
+                  How AI designs your home
+                </span>
+                {showExplainer ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+              </button>
+              
+              {showExplainer && (
+                <div className="mt-3 bg-slate-50 rounded-lg p-3 text-xs text-slate-500 space-y-2 animate-in slide-in-from-top-2">
+                  <p><strong className="text-slate-700">1. Analyze:</strong> We review your ecosystem preference (e.g., Apple vs Google) to ensure voice control compatibility.</p>
+                  <p><strong className="text-slate-700">2. Filter:</strong> We scan thousands of devices to find ones that support Matter or your specific hub.</p>
+                  <p><strong className="text-slate-700">3. Blueprint:</strong> We structure the list by room and priority to fit your budget.</p>
+                </div>
+              )}
+            </div>
+
             {/* Ad Unit: Sidebar */}
             <div className="mt-8">
               <AdPlaceholder format="rectangle" />
