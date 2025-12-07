@@ -59,8 +59,8 @@ export default async function handler(req) {
     // STRATEGY A: Google Gemini 2.5 Flash (Preferred if Key exists)
     // ---------------------------------------------------------
     if (googleApiKey) {
-      // Fixed: Use lowercase 'gemini-2.5-flash-latest' to avoid 400/404 errors
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-latest:generateContent?key=${googleApiKey}`;
+      // Fixed: Use lowercase 'gemini-2.5-flash-lite' to avoid 400/404 errors
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${googleApiKey}`;
       
       const response = await fetch(url, {
         method: 'POST',
