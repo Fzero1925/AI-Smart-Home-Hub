@@ -1,7 +1,28 @@
-import { PlannerFormData } from '../types';
 import { GoogleGenAI } from "@google/genai";
+import { PlannerFormData } from '../types';
 
+// Initialize the Google GenAI client
+// The API key must be obtained exclusively from the environment variable process.env.API_KEY.
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+
+// Helper to make API calls to Gemini
+async function callGemini(userPrompt: string, systemInstruction: string) {
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: userPrompt,
+      config: {
+        systemInstruction: systemInstruction,
+      },
+    });
+
+    // Directly access the text property as per SDK guidelines
+    return response.text || "No response generated.";
+  } catch (error) {
+    console.error("Gemini API Error:", error);
+    return "Error: Unable to connect to AI service. Please check your internet connection.";
+  }
+}
 
 export const generateSmartHomePlan = async (data: PlannerFormData): Promise<string> => {
   const systemInstruction = `You are an expert Smart Home Architect and Systems Integrator. 
@@ -21,19 +42,7 @@ Priorities: ${data.priorities.join(', ')}.
 User Skill Level: ${data.skillLevel}.
 Please provide specific product recommendations that work natively with ${data.ecosystem} (Matter/Thread support preferred if applicable).`;
 
-  try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: userPrompt,
-      config: {
-        systemInstruction: systemInstruction,
-      },
-    });
-    return response.text || "No response generated.";
-  } catch (error) {
-    console.error("AI Service Error:", error);
-    return "Error: Unable to connect to AI service. Please check your internet connection and try again.";
-  }
+  return callGemini(userPrompt, systemInstruction);
 };
 
 export const checkDeviceCompatibility = async (deviceA: string, deviceB: string): Promise<string> => {
@@ -48,19 +57,7 @@ Format as Markdown.`;
 Device A: ${deviceA}
 Device B: ${deviceB}`;
 
-  try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: userPrompt,
-      config: {
-        systemInstruction: systemInstruction,
-      },
-    });
-    return response.text || "No response generated.";
-  } catch (error) {
-    console.error("AI Service Error:", error);
-    return "Error: Unable to connect to AI service. Please check your internet connection and try again.";
-  }
+  return callGemini(userPrompt, systemInstruction);
 };
 
 export const troubleshootIssue = async (issue: string): Promise<string> => {
@@ -72,17 +69,5 @@ If hardware might be broken, suggest checking warranty.`;
 
   const userPrompt = `I am experiencing this issue: "${issue}". How do I fix it?`;
 
-  try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: userPrompt,
-      config: {
-        systemInstruction: systemInstruction,
-      },
-    });
-    return response.text || "No response generated.";
-  } catch (error) {
-    console.error("AI Service Error:", error);
-    return "Error: Unable to connect to AI service. Please check your internet connection and try again.";
-  }
+  return callGemini(userPrompt, systemInstruction);
 };

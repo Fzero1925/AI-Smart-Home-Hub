@@ -5,7 +5,7 @@ import { Compatibility } from './components/Compatibility';
 import { Troubleshoot } from './components/Troubleshoot';
 import { PrivacyPolicy, TermsOfService } from './components/LegalPages';
 import { ViewState } from './types';
-import { House, ShieldCheck, Wrench, Menu, X } from 'lucide-react';
+import { Home, ShieldCheck, Wrench, Menu, X } from 'lucide-react';
 
 const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewState>(ViewState.HOME);
@@ -69,14 +69,14 @@ const App: React.FC = () => {
             onClick={() => setCurrentView(ViewState.HOME)}
           >
             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-              <House className="text-white" size={20} />
+              <Home className="text-white" size={20} />
             </div>
             <span className="text-xl font-bold text-slate-900 tracking-tight">AI SmartHome<span className="text-blue-600">Hub</span></span>
           </div>
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-2">
-            <NavLink view={ViewState.PLANNER} label="Planner" icon={House} />
+            <NavLink view={ViewState.PLANNER} label="Planner" icon={Home} />
             <NavLink view={ViewState.COMPATIBILITY} label="Compatibility" icon={ShieldCheck} />
             <NavLink view={ViewState.TROUBLESHOOT} label="Troubleshoot" icon={Wrench} />
           </nav>
@@ -93,7 +93,7 @@ const App: React.FC = () => {
         {/* Mobile Nav */}
         {mobileMenuOpen && (
           <div className="md:hidden bg-white border-b border-slate-200 p-4 space-y-2 shadow-lg">
-            <NavLink view={ViewState.PLANNER} label="Design My Home" icon={House} />
+            <NavLink view={ViewState.PLANNER} label="Design My Home" icon={Home} />
             <NavLink view={ViewState.COMPATIBILITY} label="Check Compatibility" icon={ShieldCheck} />
             <NavLink view={ViewState.TROUBLESHOOT} label="Fix Problems" icon={Wrench} />
           </div>

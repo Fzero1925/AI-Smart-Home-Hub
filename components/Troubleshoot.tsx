@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { troubleshootIssue } from '../services/geminiService';
 import { AdPlaceholder } from './AdPlaceholder';
-import { Loader2, Wrench, MessageSquare, Send, ShoppingBag, CheckCircle2, Sparkles } from 'lucide-react';
+import { Loader2, Wrench, MessageSquare, Send, ShoppingBag, Sparkles } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
 export const Troubleshoot: React.FC = () => {
