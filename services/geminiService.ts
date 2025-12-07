@@ -1,9 +1,9 @@
 import { GoogleGenAI } from "@google/genai";
 import { PlannerFormData } from '../types';
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
 export const generateSmartHomePlan = async (data: PlannerFormData): Promise<string> => {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+
   const systemInstruction = `You are an expert Smart Home Architect and Systems Integrator. 
 Your goal is to generate a comprehensive, affiliate-friendly shopping list and setup guide.
 Format the output in clean Markdown.
@@ -25,18 +25,18 @@ Please provide specific product recommendations that work natively with ${data.e
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
       contents: userPrompt,
-      config: {
-        systemInstruction: systemInstruction,
-      },
+      config: { systemInstruction: systemInstruction },
     });
     return response.text || "No response generated.";
   } catch (error) {
-    console.error("GenAI Error:", error);
+    console.error("Gemini API Error:", error);
     return "Error: Unable to generate plan. Please try again later.";
   }
 };
 
 export const checkDeviceCompatibility = async (deviceA: string, deviceB: string): Promise<string> => {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+
   const systemInstruction = `You are a Senior Smart Home Compatibility Engineer.
 Determine if two devices/systems work together.
 Start with a clear "YES", "NO", or "REQUIRES BRIDGE" in bold.
@@ -52,18 +52,18 @@ Device B: ${deviceB}`;
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
       contents: userPrompt,
-      config: {
-        systemInstruction: systemInstruction,
-      },
+      config: { systemInstruction: systemInstruction },
     });
     return response.text || "No response generated.";
   } catch (error) {
-    console.error("GenAI Error:", error);
+    console.error("Gemini API Error:", error);
     return "Error: Unable to check compatibility. Please try again later.";
   }
 };
 
 export const troubleshootIssue = async (issue: string): Promise<string> => {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+
   const systemInstruction = `You are a helpful Smart Home Tech Support Agent.
 Provide a step-by-step troubleshooting guide for the user's issue.
 Be empathetic but technical.
@@ -76,13 +76,11 @@ If hardware might be broken, suggest checking warranty.`;
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
       contents: userPrompt,
-      config: {
-        systemInstruction: systemInstruction,
-      },
+      config: { systemInstruction: systemInstruction },
     });
     return response.text || "No response generated.";
   } catch (error) {
-    console.error("GenAI Error:", error);
+    console.error("Gemini API Error:", error);
     return "Error: Unable to troubleshoot issue. Please try again later.";
   }
 };
