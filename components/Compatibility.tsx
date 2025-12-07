@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { checkDeviceCompatibility } from '../services/geminiService';
 import { AdPlaceholder } from './AdPlaceholder';
-import { Loader2, Link as LinkIcon, AlertTriangle, CheckCircle, XCircle, Search, TrendingUp, Info } from 'lucide-react';
+import { Loader2, Link as LinkIcon, AlertTriangle, CheckCircle, XCircle, Search, TrendingUp, Info, Zap, Globe, Share2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
 export const Compatibility: React.FC = () => {
@@ -132,25 +132,44 @@ export const Compatibility: React.FC = () => {
 
       {/* Educational Content for SEO */}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
-        <div className="flex items-center gap-2 mb-4">
-            <Info className="text-blue-600" />
+        <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100">
+            <Info className="text-blue-600" size={24} />
             <h3 className="text-xl font-bold text-slate-900">Understanding Smart Home Protocols</h3>
         </div>
-        <div className="prose prose-slate max-w-none text-sm text-slate-600">
-            <p>When checking compatibility, it usually comes down to three main communication standards. Our tool analyzes these layers to determine if two devices can talk to each other.</p>
+        <div className="prose prose-slate max-w-none text-sm text-slate-600 leading-relaxed">
+            <p className="mb-6">
+              When checking compatibility, success usually depends on the communication layer. Devices don't just "talk" to each other magically; they need a common language.
+            </p>
             
-            <div className="grid md:grid-cols-3 gap-4 mt-6">
-                <div className="p-4 bg-slate-50 rounded-lg">
-                    <strong className="block text-slate-900 mb-2">1. Zigbee / Z-Wave</strong>
-                    Many sensors and lights use these low-power meshes. They usually require a <strong>Hub</strong> or <strong>Bridge</strong> to connect to your Wi-Fi router and your phone.
+            <div className="grid md:grid-cols-3 gap-6">
+                <div className="p-5 bg-slate-50 rounded-xl border border-slate-100">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Zap className="text-amber-500" size={20} />
+                      <strong className="block text-slate-900">Zigbee & Z-Wave</strong>
+                    </div>
+                    <p>
+                      These are low-power mesh networks. They create a web where every plugged-in device extends the signal. They <strong>require a hub</strong> (like a Hue Bridge or SmartThings Hub) to translate their signals into something your phone understands.
+                    </p>
                 </div>
-                <div className="p-4 bg-slate-50 rounded-lg">
-                    <strong className="block text-slate-900 mb-2">2. Wi-Fi</strong>
-                    Connects directly to your router. Simple to set up but can congest your network if you have 50+ devices.
+
+                <div className="p-5 bg-slate-50 rounded-xl border border-slate-100">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Globe className="text-blue-500" size={20} />
+                      <strong className="block text-slate-900">Wi-Fi Devices</strong>
+                    </div>
+                    <p>
+                      These connect directly to your router. They are easy to set up (no hub needed) but consume more power and can slow down your internet if you have too many (e.g., 50+ bulbs). Ideal for plugs and cameras.
+                    </p>
                 </div>
-                <div className="p-4 bg-slate-50 rounded-lg">
-                    <strong className="block text-slate-900 mb-2">3. Matter (The Future)</strong>
-                    The new standard supported by Apple, Google, and Amazon. If a device supports Matter, it is generally compatible with all major platforms automatically.
+
+                <div className="p-5 bg-slate-50 rounded-xl border border-slate-100">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Share2 className="text-indigo-500" size={20} />
+                      <strong className="block text-slate-900">Matter & Thread</strong>
+                    </div>
+                    <p>
+                      <strong>Matter</strong> is the new universal language. If a device has the Matter logo, it works with Apple, Google, and Alexa out of the box. <strong>Thread</strong> is the wireless radio technology that makes Matter fast and reliable.
+                    </p>
                 </div>
             </div>
         </div>

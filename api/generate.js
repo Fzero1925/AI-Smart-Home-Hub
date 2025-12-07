@@ -19,7 +19,7 @@ export default async function handler(req) {
     const deepseekApiKey = process.env.DEEPSEEK_API_KEY;
     
     if (!googleApiKey && !deepseekApiKey) {
-      return new Response(JSON.stringify({ error: 'Server Error: No API keys configured (GOOGLE_API_KEY or DEEPSEEK_API_KEY).' }), {
+      return new Response(JSON.stringify({ error: 'Server Configuration Error: No API keys configured (GOOGLE_API_KEY or DEEPSEEK_API_KEY) in Vercel Settings.' }), {
         status: 500,
         headers: { 'Content-Type': 'application/json' },
       });
@@ -50,17 +50,18 @@ export default async function handler(req) {
         break;
       
       default:
-        return new Response(JSON.stringify({ error: 'Invalid type' }), { status: 400 });
+        return new Response(JSON.stringify({ error: 'Invalid request type' }), { status: 400 });
     }
 
     let resultText = "";
 
     // ---------------------------------------------------------
-    // STRATEGY A: Google Gemini 2.5 Flash (Preferred if Key exists)
+    // STRATEGY A: Google Gemini 1.5 Flash (Preferred if Key exists)
     // ---------------------------------------------------------
     if (googleApiKey) {
-      // Fixed: Use lowercase 'gemini-2.5-flash-lite' to avoid 400/404 errors
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${googleApiKey}`;
+      // Use 'gemini-1.5-flash' or 'gemini-1.5-flash-latest' as it's the stable free tier model.
+      const modelName = 'gemini-1.5-flash-latest';
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${googleApiKey}`;
       
       const response = await fetch(url, {
         method: 'POST',
@@ -76,8 +77,9 @@ export default async function handler(req) {
       });
 
       if (!response.ok) {
-        const err = await response.text();
-        throw new Error(`Gemini API Error: ${response.status} - ${err}`);
+        const errorText = await response.text();
+        // Return raw Google error for debugging
+        throw new Error(`Gemini API Error (${response.status}): ${errorText}`);
       }
 
       const json = await response.json();
@@ -106,8 +108,8 @@ export default async function handler(req) {
       });
 
       if (!response.ok) {
-        const err = await response.text();
-        throw new Error(`DeepSeek API Error: ${response.status} - ${err}`);
+        const errorText = await response.text();
+        throw new Error(`DeepSeek API Error (${response.status}): ${errorText}`);
       }
 
       const json = await response.json();
@@ -118,7 +120,7 @@ export default async function handler(req) {
     // Final Output
     // ---------------------------------------------------------
     if (!resultText) {
-      return new Response(JSON.stringify({ text: "AI returned an empty response." }), {
+      return new Response(JSON.stringify({ text: "AI returned an empty response. Please try again." }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' },
       });

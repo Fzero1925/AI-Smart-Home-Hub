@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { troubleshootIssue } from '../services/geminiService';
 import { AdPlaceholder } from './AdPlaceholder';
-import { Loader2, Wrench, MessageSquare, Send, ShoppingBag, Sparkles, HelpCircle } from 'lucide-react';
+import { Loader2, Wrench, MessageSquare, Send, ShoppingBag, Sparkles, HelpCircle, WifiOff, AlertTriangle, RefreshCw } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
 export const Troubleshoot: React.FC = () => {
@@ -132,28 +132,59 @@ export const Troubleshoot: React.FC = () => {
         </div>
       </div>
 
-       {/* SEO Content Section */}
+       {/* SEO Content Section: Technical Troubleshooting Guide */}
        <section className="bg-slate-50 rounded-xl border border-slate-200 p-8">
-         <div className="flex items-center gap-3 mb-4">
-             <HelpCircle className="text-blue-600" size={24} />
-             <h3 className="text-xl font-bold text-slate-900">Common Smart Home Issues & Quick Fixes</h3>
+         <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-200">
+             <HelpCircle className="text-blue-600" size={28} />
+             <h3 className="text-xl font-bold text-slate-900">Comprehensive Smart Home Diagnostic Guide</h3>
          </div>
-         <div className="grid md:grid-cols-2 gap-8 text-sm text-slate-600">
+         
+         <div className="grid md:grid-cols-2 gap-8 text-sm text-slate-600 leading-relaxed">
              <div>
-                 <h4 className="font-bold text-slate-800 mb-2">Device "No Response"</h4>
-                 <p>This is the most common error. It usually means the device has lost connection to Wi-Fi or its Zigbee/Thread hub. Try power cycling the device (unplug for 10 seconds) first. If that fails, check if your router is overloaded.</p>
+                 <div className="flex items-center gap-2 mb-2">
+                   <WifiOff className="text-red-500" size={18} />
+                   <h4 className="font-bold text-slate-800 text-base">The "2.4GHz vs 5GHz" WiFi Problem</h4>
+                 </div>
+                 <p className="mb-4">
+                   Most smart plugs, bulbs, and older cameras <strong>only</strong> communicate on the 2.4GHz WiFi band because it has better range and penetrates walls better than 5GHz. 
+                   If your phone is on 5GHz and you try to set up a 2.4GHz device, setup often fails. 
+                   <strong>Fix:</strong> Check if your router has a dedicated "IoT Network" setting, or temporarily disable 5GHz during setup.
+                 </p>
+
+                 <div className="flex items-center gap-2 mb-2">
+                   <AlertTriangle className="text-orange-500" size={18} />
+                   <h4 className="font-bold text-slate-800 text-base">Zigbee & Channel Interference</h4>
+                 </div>
+                 <p className="mb-4">
+                   Zigbee hubs (like Philips Hue or Aqara) often operate on wireless channels that overlap with your home Wi-Fi. 
+                   If your devices are slow to respond, your Wi-Fi router might be drowning out the Zigbee signal. 
+                   <strong>Fix:</strong> Change your Zigbee channel to 25 or change your Wi-Fi router to Channel 1 or 6.
+                 </p>
              </div>
+
              <div>
-                 <h4 className="font-bold text-slate-800 mb-2">Automation Not Triggering</h4>
-                 <p>If your motion sensor isn't turning on the lights, check your hub's time zone settings. Also, ensure the batteries in the sensor aren't dead. Battery powered sensors often drop off the network when low on power.</p>
-             </div>
-             <div>
-                 <h4 className="font-bold text-slate-800 mb-2">Voice Assistant Can't Hear You</h4>
-                 <p>Microphones can get clogged with dust. Try cleaning the top of your Echo or Nest Audio with a microfiber cloth. Also, ensure it's not placed next to a loud noise source like a TV or air conditioner.</p>
-             </div>
-              <div>
-                 <h4 className="font-bold text-slate-800 mb-2">Firmware Update Failed</h4>
-                 <p>Updates often fail due to weak signal. Move the device closer to the router or hub temporarily during the update process.</p>
+                 <div className="flex items-center gap-2 mb-2">
+                   <RefreshCw className="text-blue-500" size={18} />
+                   <h4 className="font-bold text-slate-800 text-base">When to Factory Reset?</h4>
+                 </div>
+                 <p className="mb-4">
+                   Don't factory reset immediately! This often breaks automations. 
+                   <strong>Order of operations:</strong> 
+                   1. Toggle Power (Unplug/Replug). 
+                   2. Reboot Router/Hub. 
+                   3. Check App for Firmware Updates. 
+                   4. Factory Reset only as a last resort.
+                 </p>
+
+                 <div className="flex items-center gap-2 mb-2">
+                   <Wrench className="text-slate-500" size={18} />
+                   <h4 className="font-bold text-slate-800 text-base">"No Response" Status</h4>
+                 </div>
+                 <p>
+                   If Apple HomeKit says "No Response," it's often a network mDNS (Multicast DNS) issue. 
+                   Your router might be blocking discovery packets. 
+                   Rebooting your <strong>Home Hub</strong> (Apple TV or HomePod) usually forces a fresh network discovery map and resolves this ghost issue.
+                 </p>
              </div>
          </div>
        </section>

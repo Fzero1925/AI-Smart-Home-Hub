@@ -40,7 +40,7 @@ export const About: React.FC = () => {
           <h3>Contact Us</h3>
           <p>
             Have suggestions or found a bug? While we are an AI-first platform, human oversight is crucial. You can reach the administration team at: <br/>
-            <span className="font-medium text-blue-600">contact@ai-smarthomehub.com</span> (Please replace with your actual email)
+            <a href="mailto:aismarthomehub@gmail.com.cn" className="font-medium text-blue-600 hover:underline">aismarthomehub@gmail.com.cn</a>
           </p>
         </div>
       </div>

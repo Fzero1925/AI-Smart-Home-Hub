@@ -3,7 +3,7 @@ import { generateSmartHomePlan } from '../services/geminiService';
 import { PlannerFormData } from '../types';
 import { AdPlaceholder } from './AdPlaceholder';
 import ReactMarkdown from 'react-markdown';
-import { Loader2, ArrowRight, Home, DollarSign, Cpu, ShoppingBag, BookOpen } from 'lucide-react';
+import { Loader2, ArrowRight, Home, DollarSign, Cpu, ShoppingBag, BookOpen, Wifi, Lock, Layers } from 'lucide-react';
 
 export const Planner: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -159,7 +159,7 @@ export const Planner: React.FC = () => {
             <div className="h-full min-h-[400px] flex flex-col items-center justify-center bg-white rounded-2xl border border-slate-200 p-8 text-center animate-pulse">
               <Loader2 className="animate-spin text-blue-500 mb-4" size={48} />
               <h3 className="text-xl font-semibold text-slate-800">Consulting AI Architect...</h3>
-              <p className="text-slate-500 mt-2">AI is analyzing {formData.ecosystem} compatibility.</p>
+              <p className="text-slate-500 mt-2">AI is analyzing {formData.ecosystem} compatibility and building your roadmap.</p>
             </div>
           )}
 
@@ -198,7 +198,7 @@ export const Planner: React.FC = () => {
                       </ReactMarkdown>
                   </div>
                   <div className="mt-8 pt-6 border-t border-slate-100 text-center text-sm text-slate-400">
-                    * Prices are estimates. Links take you to Amazon search.
+                    * Prices are estimates. Links take you to Amazon search results.
                   </div>
                </div>
                
@@ -209,37 +209,59 @@ export const Planner: React.FC = () => {
         </div>
       </div>
 
-      {/* SEO Content Section */}
+      {/* SEO Content Section: Comprehensive Guide */}
       <section className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 mt-12">
-        <div className="flex items-center gap-3 mb-6">
-          <BookOpen className="text-blue-600" size={24} />
-          <h2 className="text-2xl font-bold text-slate-900">How to Plan Your Smart Home Ecosystem</h2>
+        <div className="flex items-center gap-3 mb-8 border-b border-slate-100 pb-4">
+          <BookOpen className="text-blue-600" size={28} />
+          <h2 className="text-2xl font-bold text-slate-900">Expert Guide: Designing a Robust Smart Home</h2>
         </div>
         
-        <div className="prose prose-slate max-w-none text-slate-600">
-          <h3>Why use an AI Smart Home Planner?</h3>
-          <p>
-            Building a smart home can be overwhelming. With thousands of devices from brands like Philips Hue, Aqara, Ring, and Nest, ensuring everything works together is the biggest challenge. A unified ecosystem ensures that your lights, locks, and cameras can all be controlled from a single app and can trigger each other automatically.
-          </p>
+        <div className="grid md:grid-cols-2 gap-8 text-slate-600 leading-relaxed">
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <Layers className="text-indigo-600" size={20} />
+              <h3 className="text-lg font-bold text-slate-800">1. The Ecosystem Choice</h3>
+            </div>
+            <p className="mb-4">
+              The "Brain" of your smart home determines everything. 
+              <strong> Apple HomeKit</strong> is ideal for iPhone users who prioritize local privacy and security, though compatible devices can be pricier. 
+              <strong> Google Home</strong> shines with its Assistant's ability to answer questions and integrate with Android. 
+              <strong> Amazon Alexa</strong> offers the widest compatibility with budget-friendly devices.
+              Mixing these systems is possible but often leads to a fragmented experience.
+            </p>
 
-          <h3>Step 1: Choose Your "Brain" (Ecosystem)</h3>
-          <p>
-            The most critical decision is your platform. 
-            <strong> Apple HomeKit</strong> is known for security and privacy but has fewer compatible devices. 
-            <strong> Google Home</strong> offers the best voice assistant intelligence. 
-            <strong> Amazon Alexa</strong> has the widest device support. 
-            Our tool filters recommendations based on this choice to prevent you from buying incompatible gear.
-          </p>
+            <div className="flex items-center gap-2 mb-3">
+              <Wifi className="text-indigo-600" size={20} />
+              <h3 className="text-lg font-bold text-slate-800">2. Network Infrastructure</h3>
+            </div>
+            <p className="mb-4">
+              A standard ISP router often fails when you add 30+ smart bulbs and switches. 
+              For homes larger than 1,000 sq ft, we strongly recommend a <strong>Mesh Wi-Fi System</strong> (like Eero or Nest Wifi). 
+              Alternatively, using a hub-based protocol like <strong>Zigbee</strong> or <strong>Lutron Clear Connect</strong> keeps traffic off your Wi-Fi network, ensuring your Netflix stream doesn't buffer when you turn on the lights.
+            </p>
+          </div>
 
-          <h3>Step 2: Start with Protocols</h3>
-          <p>
-            Modern smart homes rely on protocols like <strong>Zigbee</strong>, <strong>Z-Wave</strong>, and the new <strong>Matter</strong> standard. Matter is particularly important as it allows devices to work across all ecosystems. Our AI prioritizes Matter-compatible devices to future-proof your investment.
-          </p>
+          <div>
+             <div className="flex items-center gap-2 mb-3">
+              <Lock className="text-indigo-600" size={20} />
+              <h3 className="text-lg font-bold text-slate-800">3. Privacy & Cloud vs. Local</h3>
+            </div>
+            <p className="mb-4">
+              Smart cameras and doorbells often rely on the cloud for video processing, which requires a subscription. 
+              If privacy is paramount, look for devices that offer <strong>local storage</strong> (via SD card or NAS), such as cameras from Eufy or Ubiquiti. 
+              Lighting and sensors should ideally operate locally, so they still work even if your internet goes down.
+            </p>
 
-          <h3>Step 3: Define Priorities</h3>
-          <p>
-            Don't try to automate everything at once. Start with high-impact categories like <em>Lighting</em> (smart bulbs/switches) or <em>Security</em> (cameras/doorbells). This incremental approach, often called the "Minimum Viable Smart Home," saves money and reduces troubleshooting headaches.
-          </p>
+            <div className="flex items-center gap-2 mb-3">
+              <Cpu className="text-indigo-600" size={20} />
+              <h3 className="text-lg font-bold text-slate-800">4. Future Proofing with Matter</h3>
+            </div>
+            <p className="mb-4">
+              <strong>Matter</strong> is the new interoperability standard. A Matter-certified device works with Apple, Google, and Alexa simultaneously. 
+              When planning your home in 2024 and beyond, prioritizing Matter/Thread devices ensures you aren't locked into one brand forever. 
+              Our AI planner prioritizes these devices to protect your investment.
+            </p>
+          </div>
         </div>
       </section>
 
