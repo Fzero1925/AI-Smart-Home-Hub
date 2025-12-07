@@ -56,11 +56,11 @@ export default async function handler(req) {
     let resultText = "";
 
     // ---------------------------------------------------------
-    // STRATEGY A: Google Gemini 1.5 Flash (Preferred if Key exists)
+    // STRATEGY A: Google Gemini (Preferred if Key exists)
     // ---------------------------------------------------------
     if (googleApiKey) {
-      // Use 'gemini-1.5-flash' or 'gemini-1.5-flash-latest' as it's the stable free tier model.
-      const modelName = 'gemini-1.5-flash-latest';
+      // Using gemini-2.5-flash-lite as requested
+      const modelName = 'gemini-2.5-flash-lite';
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${googleApiKey}`;
       
       const response = await fetch(url, {
