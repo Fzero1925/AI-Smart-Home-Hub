@@ -4,8 +4,9 @@ import { Planner } from './components/Planner';
 import { Compatibility } from './components/Compatibility';
 import { Troubleshoot } from './components/Troubleshoot';
 import { PrivacyPolicy, TermsOfService } from './components/LegalPages';
+import { About } from './components/About';
 import { ViewState } from './types';
-import { Home, ShieldCheck, Wrench, Menu, X } from 'lucide-react';
+import { Home, ShieldCheck, Wrench, Menu, X, Info } from 'lucide-react';
 
 const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewState>(ViewState.HOME);
@@ -15,13 +16,15 @@ const App: React.FC = () => {
   useEffect(() => {
     let title = "AI SmartHome Hub";
     switch(currentView) {
-      case ViewState.PLANNER: title = "Smart Home Planner & Design Tool"; break;
-      case ViewState.COMPATIBILITY: title = "Smart Home Device Compatibility Checker"; break;
-      case ViewState.TROUBLESHOOT: title = "Smart Home Troubleshooting Assistant"; break;
+      case ViewState.PLANNER: title = "Smart Home Planner & Design Tool | AI SmartHome Hub"; break;
+      case ViewState.COMPATIBILITY: title = "Check Device Compatibility (Matter, Zigbee) | AI SmartHome Hub"; break;
+      case ViewState.TROUBLESHOOT: title = "Smart Home Troubleshooting Assistant | AI SmartHome Hub"; break;
       case ViewState.PRIVACY: title = "Privacy Policy - AI SmartHome Hub"; break;
       case ViewState.TERMS: title = "Terms of Service - AI SmartHome Hub"; break;
+      case ViewState.ABOUT: title = "About Us - AI SmartHome Hub"; break;
     }
     document.title = title;
+    window.scrollTo(0, 0); // Scroll to top on navigation
   }, [currentView]);
 
   const renderView = () => {
@@ -36,6 +39,8 @@ const App: React.FC = () => {
         return <PrivacyPolicy />;
       case ViewState.TERMS:
         return <TermsOfService />;
+      case ViewState.ABOUT:
+        return <About />;
       case ViewState.HOME:
       default:
         return <Hero onNavigate={setCurrentView} />;
@@ -96,6 +101,7 @@ const App: React.FC = () => {
             <NavLink view={ViewState.PLANNER} label="Design My Home" icon={Home} />
             <NavLink view={ViewState.COMPATIBILITY} label="Check Compatibility" icon={ShieldCheck} />
             <NavLink view={ViewState.TROUBLESHOOT} label="Fix Problems" icon={Wrench} />
+            <NavLink view={ViewState.ABOUT} label="About Us" icon={Info} />
           </div>
         )}
       </header>
@@ -123,8 +129,9 @@ const App: React.FC = () => {
             </ul>
           </div>
           <div>
-            <h4 className="text-white font-semibold mb-4">Legal</h4>
+            <h4 className="text-white font-semibold mb-4">Legal & Info</h4>
             <ul className="space-y-2 text-sm">
+              <li className="hover:text-white cursor-pointer" onClick={() => setCurrentView(ViewState.ABOUT)}>About Us</li>
               <li className="hover:text-white cursor-pointer" onClick={() => setCurrentView(ViewState.PRIVACY)}>Privacy Policy</li>
               <li className="hover:text-white cursor-pointer" onClick={() => setCurrentView(ViewState.TERMS)}>Terms of Service</li>
             </ul>

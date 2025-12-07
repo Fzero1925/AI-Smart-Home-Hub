@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { troubleshootIssue } from '../services/geminiService';
 import { AdPlaceholder } from './AdPlaceholder';
-import { Loader2, Wrench, MessageSquare, Send, ShoppingBag, Sparkles } from 'lucide-react';
+import { Loader2, Wrench, MessageSquare, Send, ShoppingBag, Sparkles, HelpCircle } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
 export const Troubleshoot: React.FC = () => {
@@ -28,7 +28,7 @@ export const Troubleshoot: React.FC = () => {
         <p className="text-slate-600 mt-2">Describe your problem, and we'll help you fix it.</p>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden flex flex-col min-h-[600px]">
+      <div className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden flex flex-col min-h-[600px] mb-12">
         {/* Chat Area */}
         <div className="flex-1 p-6 bg-slate-50/50 overflow-y-auto">
           {!response && !loading && (
@@ -131,6 +131,33 @@ export const Troubleshoot: React.FC = () => {
           </p>
         </div>
       </div>
+
+       {/* SEO Content Section */}
+       <section className="bg-slate-50 rounded-xl border border-slate-200 p-8">
+         <div className="flex items-center gap-3 mb-4">
+             <HelpCircle className="text-blue-600" size={24} />
+             <h3 className="text-xl font-bold text-slate-900">Common Smart Home Issues & Quick Fixes</h3>
+         </div>
+         <div className="grid md:grid-cols-2 gap-8 text-sm text-slate-600">
+             <div>
+                 <h4 className="font-bold text-slate-800 mb-2">Device "No Response"</h4>
+                 <p>This is the most common error. It usually means the device has lost connection to Wi-Fi or its Zigbee/Thread hub. Try power cycling the device (unplug for 10 seconds) first. If that fails, check if your router is overloaded.</p>
+             </div>
+             <div>
+                 <h4 className="font-bold text-slate-800 mb-2">Automation Not Triggering</h4>
+                 <p>If your motion sensor isn't turning on the lights, check your hub's time zone settings. Also, ensure the batteries in the sensor aren't dead. Battery powered sensors often drop off the network when low on power.</p>
+             </div>
+             <div>
+                 <h4 className="font-bold text-slate-800 mb-2">Voice Assistant Can't Hear You</h4>
+                 <p>Microphones can get clogged with dust. Try cleaning the top of your Echo or Nest Audio with a microfiber cloth. Also, ensure it's not placed next to a loud noise source like a TV or air conditioner.</p>
+             </div>
+              <div>
+                 <h4 className="font-bold text-slate-800 mb-2">Firmware Update Failed</h4>
+                 <p>Updates often fail due to weak signal. Move the device closer to the router or hub temporarily during the update process.</p>
+             </div>
+         </div>
+       </section>
+
     </div>
   );
 };

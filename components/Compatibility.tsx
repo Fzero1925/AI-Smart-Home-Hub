@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { checkDeviceCompatibility } from '../services/geminiService';
 import { AdPlaceholder } from './AdPlaceholder';
-import { Loader2, Link as LinkIcon, AlertTriangle, CheckCircle, XCircle, Search, TrendingUp } from 'lucide-react';
+import { Loader2, Link as LinkIcon, AlertTriangle, CheckCircle, XCircle, Search, TrendingUp, Info } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
 export const Compatibility: React.FC = () => {
@@ -100,7 +100,7 @@ export const Compatibility: React.FC = () => {
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
         <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
            <h3 className="font-semibold text-slate-800 mb-4 flex items-center gap-2">
              <TrendingUp size={18} className="text-blue-500"/>
@@ -125,9 +125,34 @@ export const Compatibility: React.FC = () => {
            </div>
         </div>
 
-        {/* Replaced Text Block with Ad Placeholder for better monetization */}
         <div className="flex flex-col gap-4">
            <AdPlaceholder format="rectangle" className="h-full bg-white" />
+        </div>
+      </div>
+
+      {/* Educational Content for SEO */}
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+        <div className="flex items-center gap-2 mb-4">
+            <Info className="text-blue-600" />
+            <h3 className="text-xl font-bold text-slate-900">Understanding Smart Home Protocols</h3>
+        </div>
+        <div className="prose prose-slate max-w-none text-sm text-slate-600">
+            <p>When checking compatibility, it usually comes down to three main communication standards. Our tool analyzes these layers to determine if two devices can talk to each other.</p>
+            
+            <div className="grid md:grid-cols-3 gap-4 mt-6">
+                <div className="p-4 bg-slate-50 rounded-lg">
+                    <strong className="block text-slate-900 mb-2">1. Zigbee / Z-Wave</strong>
+                    Many sensors and lights use these low-power meshes. They usually require a <strong>Hub</strong> or <strong>Bridge</strong> to connect to your Wi-Fi router and your phone.
+                </div>
+                <div className="p-4 bg-slate-50 rounded-lg">
+                    <strong className="block text-slate-900 mb-2">2. Wi-Fi</strong>
+                    Connects directly to your router. Simple to set up but can congest your network if you have 50+ devices.
+                </div>
+                <div className="p-4 bg-slate-50 rounded-lg">
+                    <strong className="block text-slate-900 mb-2">3. Matter (The Future)</strong>
+                    The new standard supported by Apple, Google, and Amazon. If a device supports Matter, it is generally compatible with all major platforms automatically.
+                </div>
+            </div>
         </div>
       </div>
     </div>
