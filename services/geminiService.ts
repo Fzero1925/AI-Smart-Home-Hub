@@ -1,7 +1,7 @@
 import { PlannerFormData } from '../types';
 
-// Frontend service now calls the Vercel Serverless Function (/api/generate)
-// This keeps the API Key hidden on the server.
+// Frontend service calls Vercel Serverless Function (/api/generate)
+// This keeps the DEEPSEEK_API_KEY hidden on the server.
 
 const callApi = async (type: 'plan' | 'compatibility' | 'troubleshoot', data: any): Promise<string> => {
   try {
@@ -13,15 +13,18 @@ const callApi = async (type: 'plan' | 'compatibility' | 'troubleshoot', data: an
       body: JSON.stringify({ type, data }),
     });
 
+    const result = await response.json();
+
     if (!response.ok) {
-      throw new Error(`API Error: ${response.statusText}`);
+      // Return the specific error message from the backend (e.g., "API Key missing")
+      throw new Error(result.error || `Server Error: ${response.status}`);
     }
 
-    const result = await response.json();
     return result.text || "No response received.";
-  } catch (error) {
+  } catch (error: any) {
     console.error("Smart Home Hub API Error:", error);
-    return "Error: Unable to communicate with the AI assistant. Please try again.";
+    // Display the actual error message to the user/developer for easier debugging
+    return `Error: ${error.message || "Unable to communicate with the AI assistant."}`;
   }
 };
 

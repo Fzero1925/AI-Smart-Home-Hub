@@ -1,7 +1,5 @@
-import { GoogleGenAI } from "@google/genai";
-
 export const config = {
-  runtime: 'edge', // Optional: Use Edge runtime for faster cold starts, or remove for Node.js
+  runtime: 'edge',
 };
 
 export default async function handler(req) {
@@ -15,84 +13,78 @@ export default async function handler(req) {
   try {
     const { type, data } = await req.json();
     
-    // Server-side environment variable
-    const apiKey = process.env.API_KEY; 
+    // Read the DEEPSEEK_API_KEY from Vercel Environment Variables
+    const apiKey = process.env.DEEPSEEK_API_KEY; 
     
     if (!apiKey) {
-      return new Response(JSON.stringify({ error: 'Server configuration error: API Key missing' }), {
+      return new Response(JSON.stringify({ error: 'Server Error: DEEPSEEK_API_KEY is missing in Vercel settings.' }), {
         status: 500,
         headers: { 'Content-Type': 'application/json' },
       });
     }
 
-    const ai = new GoogleGenAI({ apiKey });
-    
-    let model = 'gemini-2.5-flash';
+    // Construct the prompt based on the user's request type
     let systemInstruction = '';
     let userPrompt = '';
 
-    // Logic moved from frontend to backend for security
     switch (type) {
       case 'plan':
-        model = 'gemini-3-pro-preview';
-        systemInstruction = `You are an expert Smart Home Architect and Systems Integrator. 
-Your goal is to generate a comprehensive, affiliate-friendly shopping list and setup guide.
-Format the output in clean Markdown.
-For every specific product recommendation, create a search link in this format: [Product Name](https://www.amazon.com/s?k=Product+Name+Smart+Home).
-Structure:
-1. Executive Summary
-2. Core Hub/Controller
-3. Device Checklist (grouped by room or category) with estimated prices
-4. Automation Ideas based on user priorities
-5. Installation Tips`;
-        userPrompt = `Design a smart home system for a "${data.homeType}" using the "${data.ecosystem}" ecosystem.
-Budget: ${data.budget}.
-Priorities: ${data.priorities.join(', ')}.
-User Skill Level: ${data.skillLevel}.
-Please provide specific product recommendations that work natively with ${data.ecosystem} (Matter/Thread support preferred if applicable).`;
+        systemInstruction = `You are an expert Smart Home Architect. Generate a comprehensive shopping list and setup guide. 
+        Format output in Markdown. 
+        For product recommendations, create Amazon search links like this: [Product Name](https://www.amazon.com/s?k=Product+Name+Smart+Home).`;
+        userPrompt = `Design a smart home for a "${data.homeType}" using "${data.ecosystem}". 
+        Budget: ${data.budget}. Priorities: ${data.priorities.join(', ')}. Skill Level: ${data.skillLevel}.`;
         break;
 
       case 'compatibility':
-        model = 'gemini-2.5-flash';
-        systemInstruction = `You are a Senior Smart Home Compatibility Engineer.
-Determine if two devices/systems work together.
-Start with a clear "YES", "NO", or "REQUIRES BRIDGE" in bold.
-Then explain the protocol (Zigbee, Z-Wave, WiFi, Thread, Matter) and how to connect them.
-If they are incompatible, suggest a workaround (e.g., using Home Assistant or a specific hub).
-Format as Markdown.`;
-        userPrompt = `Check compatibility between:
-Device A: ${data.deviceA}
-Device B: ${data.deviceB}`;
+        systemInstruction = `You are a Smart Home Compatibility Engineer. 
+        Start with "YES", "NO", or "REQUIRES BRIDGE" in bold. Explain the protocols (Zigbee, Matter, etc.).`;
+        userPrompt = `Check compatibility between: ${data.deviceA} and ${data.deviceB}.`;
         break;
 
       case 'troubleshoot':
-        model = 'gemini-2.5-flash';
-        systemInstruction = `You are a helpful Smart Home Tech Support Agent.
-Provide a step-by-step troubleshooting guide for the user's issue.
-Be empathetic but technical.
-Use bolding for key steps.
-If hardware might be broken, suggest checking warranty.`;
-        userPrompt = `I am experiencing this issue: "${data.issue}". How do I fix it?`;
+        systemInstruction = `You are a Technical Support Agent. Provide step-by-step troubleshooting.`;
+        userPrompt = `Issue: "${data.issue}". How do I fix it?`;
         break;
-
+      
       default:
-        throw new Error('Invalid request type');
+        return new Response(JSON.stringify({ error: 'Invalid type' }), { status: 400 });
     }
 
-    const response = await ai.models.generateContent({
-      model,
-      contents: userPrompt,
-      config: { systemInstruction },
+    // Call DeepSeek API (OpenAI Compatible Interface)
+    const response = await fetch('https://api.deepseek.com/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages: [
+          { role: 'system', content: systemInstruction },
+          { role: 'user', content: userPrompt }
+        ],
+        temperature: 0.7,
+        stream: false
+      })
     });
 
-    return new Response(JSON.stringify({ text: response.text }), {
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`DeepSeek API Error: ${response.status} - ${errorText}`);
+    }
+
+    const json = await response.json();
+    const text = json.choices?.[0]?.message?.content || "No response generated.";
+
+    return new Response(JSON.stringify({ text }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
 
   } catch (error) {
-    console.error("API Error:", error);
-    return new Response(JSON.stringify({ error: 'Failed to generate content' }), {
+    console.error("Backend API Error:", error);
+    return new Response(JSON.stringify({ error: error.message || 'Internal Server Error' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
     });
