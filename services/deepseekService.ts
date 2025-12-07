@@ -1,9 +1,49 @@
-import { GoogleGenAI } from "@google/genai";
+// NOTE: This service is deprecated. Switched back to Gemini API (services/geminiService.ts).
+// The code below is commented out to prevent TypeScript errors.
+
+/*
 import { PlannerFormData } from '../types';
 
-// Initialize the Google GenAI SDK
-// The API key must be obtained exclusively from the environment variable process.env.API_KEY
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+const API_KEY = import.meta.env.VITE_DEEPSEEK_API_KEY;
+const API_URL = 'https://api.deepseek.com/chat/completions';
+
+const callDeepSeek = async (systemPrompt: string, userPrompt: string): Promise<string> => {
+  if (!API_KEY) {
+    console.error("Missing VITE_DEEPSEEK_API_KEY");
+    return "Configuration Error: API Key is missing. Please add VITE_DEEPSEEK_API_KEY to your Vercel environment variables.";
+  }
+
+  try {
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${API_KEY}`
+      },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
+        ],
+        stream: false,
+        temperature: 1.0
+      })
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        console.error("DeepSeek API Error Response:", errorData);
+        throw new Error(`API Error: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data.choices?.[0]?.message?.content || "No response generated.";
+  } catch (error) {
+    console.error("DeepSeek Service Error:", error);
+    return "Error: Unable to connect to AI service. Please check your network or try again later.";
+  }
+};
 
 export const generateSmartHomePlan = async (data: PlannerFormData): Promise<string> => {
   const systemInstruction = `You are an expert Smart Home Architect and Systems Integrator. 
@@ -23,18 +63,7 @@ Priorities: ${data.priorities.join(', ')}.
 User Skill Level: ${data.skillLevel}.
 Please provide specific product recommendations that work natively with ${data.ecosystem} (Matter/Thread support preferred if applicable).`;
 
-  try {
-    // Use gemini-3-pro-preview for complex tasks like home planning
-    const response = await ai.models.generateContent({
-      model: 'gemini-3-pro-preview',
-      contents: userPrompt,
-      config: { systemInstruction: systemInstruction },
-    });
-    return response.text || "No response generated.";
-  } catch (error) {
-    console.error("Gemini API Error:", error);
-    return "Error: Unable to generate plan. Please try again later.";
-  }
+  return callDeepSeek(systemInstruction, userPrompt);
 };
 
 export const checkDeviceCompatibility = async (deviceA: string, deviceB: string): Promise<string> => {
@@ -49,18 +78,7 @@ Format as Markdown.`;
 Device A: ${deviceA}
 Device B: ${deviceB}`;
 
-  try {
-    // Use gemini-2.5-flash for basic text/reasoning tasks
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: userPrompt,
-      config: { systemInstruction: systemInstruction },
-    });
-    return response.text || "No response generated.";
-  } catch (error) {
-    console.error("Gemini API Error:", error);
-    return "Error: Unable to check compatibility. Please try again later.";
-  }
+  return callDeepSeek(systemInstruction, userPrompt);
 };
 
 export const troubleshootIssue = async (issue: string): Promise<string> => {
@@ -72,16 +90,10 @@ If hardware might be broken, suggest checking warranty.`;
 
   const userPrompt = `I am experiencing this issue: "${issue}". How do I fix it?`;
 
-  try {
-    // Use gemini-2.5-flash for troubleshooting Q&A
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: userPrompt,
-      config: { systemInstruction: systemInstruction },
-    });
-    return response.text || "No response generated.";
-  } catch (error) {
-    console.error("Gemini API Error:", error);
-    return "Error: Unable to troubleshoot issue. Please try again later.";
-  }
+  return callDeepSeek(systemInstruction, userPrompt);
 };
+*/
+
+export const generateSmartHomePlan = async (data: any): Promise<string> => { throw new Error("Deprecated"); };
+export const checkDeviceCompatibility = async (deviceA: string, deviceB: string): Promise<string> => { throw new Error("Deprecated"); };
+export const troubleshootIssue = async (issue: string): Promise<string> => { throw new Error("Deprecated"); };
