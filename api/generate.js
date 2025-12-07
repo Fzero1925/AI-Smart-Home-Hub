@@ -60,7 +60,7 @@ export default async function handler(req) {
     // ---------------------------------------------------------
     if (googleApiKey) {
       // Updated model name to 'Gemini 2.5 Flash' to ensure availability and avoid 404s
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/Gemini 2.5 Flash:generateContent?key=${googleApiKey}`;
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/Gemini-2.5-Flash:generateContent?key=${googleApiKey}`;
       
       const response = await fetch(url, {
         method: 'POST',
