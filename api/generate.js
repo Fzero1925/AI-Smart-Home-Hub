@@ -59,8 +59,8 @@ export default async function handler(req) {
     // STRATEGY A: Google Gemini 1.5 Flash (Preferred if Key exists)
     // ---------------------------------------------------------
     if (googleApiKey) {
-      // Using Gemini REST API directly to avoid 'npm install' dependency issues in Serverless functions
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${googleApiKey}`;
+      // Updated model name to 'gemini-1.5-flash-latest' to ensure availability and avoid 404s
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${googleApiKey}`;
       
       const response = await fetch(url, {
         method: 'POST',
